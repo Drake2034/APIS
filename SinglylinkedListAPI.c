@@ -2,19 +2,25 @@
 #include <stdlib.h>
 #include "linkedlist.h"
 
-typedef struct node{
-    void* data;
-    struct node* next;
-}node_t;
+node_t* newNode(void* value){
+    node_t* node = (node_t*)malloc(sizeof(node_t));
+    if(!node){
+        return NULL;
+    }
+    node->next = NULL;
+    node->data = value;
+    return node;
+}
 
-struct singlylist{
-    node_t* head;
-    node_t* tail;
-    size_t size;
-};
+static void freeNode(node_t* node){
+    if(!node) return;
+
+    printf("node memory freed at %p\n", (void*) node);
+    free(node);
+}
 
 list_t* initList(void){
-    list_t* list = malloc(sizeof(list_t));
+    list_t* list = (list_t*)malloc(sizeof(list_t));
     if(!list){
         printf("couldn't allocate memory\n");
         return NULL;
@@ -27,31 +33,22 @@ list_t* initList(void){
     return list;
 }
 
-static void freeNode(node_t* node, list_free_func free_func){
-    if(!node) return;
-    if(free_func && node->data){
-        free_func(node->data);
-        printf("node memory freed at %p\n", (void*) node);
-    }
-    
-    free(node);
-}
-
-list_status_t freeList(list_t* list, list_free_func free_func){
+list_status_t freeList(list_t* list){
     if(!list) return LIST_STATUS_INVALID;
     
     node_t* walk = list->head;
     while(walk){
         node_t* next = walk->next;
-        if (free_func && walk->data){
-            freefunc(walk->data);
-            printf("list memory freed at %p\n", (void*)list);
-        }
+        
         free(walk);
+        printf("element memory freed at %p\n", (void*)walk);
+        
         walk = next;
     }
+
     list->head = list->tail = NULL;
     list->size = 0;
+
     printf("list freed at %p\n", (void*)list);
     return LIST_STATUS_OK;
 }
@@ -59,7 +56,7 @@ list_status_t freeList(list_t* list, list_free_func free_func){
 list_status_t listPushFront(list_t* list, void* value){
     if(!list) return LIST_STATUS_INVALID;
 
-    node_t* nodeToPush = newNode(sizeof(node_t));
+    node_t* nodeToPush = (node_t*)malloc(sizeof(node_t));
     if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
 
     nodeToPush->data = value;
@@ -77,8 +74,9 @@ list_status_t listPushFront(list_t* list, void* value){
 list_status_t listPushBack(list_t* list, void* value){
     if(!list) return LIST_STATUS_INVALID;
 
-    node_t* nodeToPush = malloc(sizeof(node_t));
+    node_t* nodeToPush = (node_t*)malloc(sizeof(node_t));
     if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
+
     nodeToPush->data = value;
     nodeToPush->next = NULL;
 
@@ -103,7 +101,7 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
         return listPushBack(list, value);
 
  
-    node_t* nodeToInsert = malloc(sizeof(node_t));
+    node_t* nodeToInsert = (node_t*)malloc(sizeof(node_t));
     if(!nodeToInsert) return LIST_STATUS_NO_MEMORY;
     nodeToInsert->data = value;
 
@@ -120,7 +118,7 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     return LIST_STATUS_OK;
 }
 
-list_status_t listPopFront(list_t* list, void** output){
+list_status_t listPopFront(list_t* list){
     if(!list) return LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY;
 
@@ -129,13 +127,12 @@ list_status_t listPopFront(list_t* list, void** output){
     if(list->head == NULL) list->tail = NULL;
 
     list->size--;
-    if(output)
-        *output = node->data;
+
     free(node);
     return LIST_STATUS_OK;
 }
 
-list_status_t listPopBack(list_t* list, void** output){
+list_status_t listPopBack(list_t* list){
     if(!list) LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY;
 
@@ -143,9 +140,6 @@ list_status_t listPopBack(list_t* list, void** output){
         node_t* node = list->head;
         list->head = list->head = NULL;
         list->size = 0;
-        
-        if(output)
-            *output = node->data;
 
         free(node);
         return LIST_STATUS_OK;
@@ -162,23 +156,20 @@ list_status_t listPopBack(list_t* list, void** output){
     list->tail->next = NULL;
     list->size--;
 
-    if(output)
-        *output = walk->data;
-
     free(walk);
     return LIST_STATUS_OK;
 }
 
-list_status_t listRemoveAt(list_t* list, size_t location, void** output){
+list_status_t listRemoveAt(list_t* list, size_t location){
     if(!list) return LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY;
 
     if(location >= list->size)
         return LIST_STATUS_INVALID;
     if(location == 0)
-        return listPopFront(list, output);
+        return listPopFront(list);
     if(location == list->size - 1)
-        return listPopBack(list, output);
+        return listPopBack(list);
     
     node_t* prev = list->head;
 
@@ -188,15 +179,12 @@ list_status_t listRemoveAt(list_t* list, size_t location, void** output){
 
     node_t*curr = prev->next;
 
-    if(output)
-        *output = curr->data;
-
     free(curr);
     list->size--;
     return LIST_STATUS_OK;
 }
 
-list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, void** output){
+list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags){
     if(!list || !pred_func) return LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY; 
 
@@ -208,7 +196,6 @@ list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* us
                 prev->next = curr->next;
             else
                 list->head = curr->next;
-            if(output) *output = curr->data;
 
             free(curr);
             list->size--;
@@ -276,4 +263,18 @@ list_status_t listReverse(list_t* list){
     list->tail = list->head;
     list->head = prev;
     return LIST_STATUS_OK;
+}
+
+list_status_t displayList(list_t* list, list_print_func display){
+    if(!list) return LIST_STATUS_INVALID;
+    if(!list->head) return LIST_STATUS_EMPTY;
+
+    node_t* walk = list->head;
+    printf("\n");
+    while(walk){
+        display(walk->data);
+        printf(" -> ");
+        walk = walk->next;
+    }
+    printf("NULL\n");
 }

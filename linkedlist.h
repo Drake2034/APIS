@@ -10,55 +10,64 @@
         LIST_STATUS_EMPTY,
         LIST_STATUS_NOT_FOUND
     }list_status_t;
+
+    enum flags{
+        LIST_FIRST = 1,
+        LIST_MIDDLE = 2,
+        LIST_LAST = 3,
+        LIST_ALL = 4
+    };
     
-    typedef struct singlylist list_t;
+    typedef struct node{
+        void* data;
+        struct node* next;
+    }node_t;
+
+    typedef struct singlylist{
+        node_t* head;
+        node_t* tail;
+        size_t size;
+    }list_t;
 
     //callback types
-    typedef void (*list_free_func)(void* data);
     typedef void (*list_iterate_func)(void* data, void* user);
-    typedef bool (*list_predicate_func)(void* element, void* user_data);
+        list_status_t listForEach(const list_t* list, list_iterate_func func, void* user);
 
+    typedef bool (*list_predicate_func)(void* element, void* user_data);
+        bool match(void* element, void* data){
+            return *(int*)element == *(int*)data;
+        }
+        bool not_match(void* element, void* data){
+            return !match(element, data);
+        }
+
+        list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
+        list_status_t listFindIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
+
+    typedef void (*list_print_func)(void* data);
+        //to work on
+        void printer(void* data){}
+
+        list_status_t displayList(list_t* list, list_print_func func);
+
+    node_t* newNode(void* data);
+    void freeNode(node_t* node);
 
     list_t* initList(void);
-    void freeNode(node_t* node, list_free_func free_func);
-    list_status_t freeList(list_t *list, list_free_func free_func);
+    list_status_t freeList(list_t *list);
 
     list_status_t listPushFront(list_t* list, void* value);
     list_status_t listPushBack(list_t* list, void* value);
     list_status_t listInsertAt(list_t* list, size_t location, void* value);
 
-    list_status_t listPopFront(list_t* list, void** output);
-    list_status_t listPopBack(list_t* list, void** output);
+    list_status_t listPopFront(list_t* list);
+    list_status_t listPopBack(list_t* list);
 
-    bool match(void* element, void* data){
-        return *(int*)element == *(int*)data;
-    }
-
-    list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, void** output);
-
-    void listRemoveFirst(list_t* list, void* value, void** output){
-        listRemoveIf(list, match, &value, output);
-    }
-
-    void listRemoveAll(list_t* list, void* value, void** output){
-        while(listRemoveIf(list, match, &value, output));
-    }
-
-    //to work on
-    void listRemoveLast(list_t* list, int value, void** output){
-        listRemoveIf(list, match, &value, output);
-    }
-    list_status_t listRemoveAt(list_t* list, size_t location, void** output);
-    
-    list_status_t listFindIf(list_t* list, list_predicate_func pred_func, void* user_data);
+    list_status_t listRemoveAt(list_t* list, size_t location);
 
     size_t listSize(const list_t* list);
     int listIsEmpty(const list_t* list);
     int listIsCircular(const list_t* list);
 
     list_status_t listReverse(list_t* list);
-
-    list_status_t listForEach(const list_t* list, list_iterate_func func, void* user);
-
-
 #endif
