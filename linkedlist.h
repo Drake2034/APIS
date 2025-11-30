@@ -8,14 +8,19 @@
         LIST_STATUS_NO_MEMORY,
         LIST_STATUS_INVALID,
         LIST_STATUS_EMPTY,
-        LIST_STATUS_NOT_FOUND
+        LIST_STATUS_FOUND,
+        LIST_STATUS_NOT_FOUND,
+        LIST_STATUS_IDENTICAL,
+        LIST_STATUS_NOT_IDENTICAL
     }list_status_t;
 
     enum flags{
         LIST_FIRST = 1,
         LIST_MIDDLE = 2,
         LIST_LAST = 3,
-        LIST_ALL = 4
+        LIST_FIRST_HALF = 4,
+        LIST_SECOND_HALF = 5,
+        LIST_ALL = 6
     };
     
     typedef struct node{

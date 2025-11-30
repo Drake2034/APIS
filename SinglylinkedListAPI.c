@@ -5,6 +5,7 @@
 node_t* newNode(void* value){
     node_t* node = (node_t*)malloc(sizeof(node_t));
     if(!node){
+        printf("couldn't allocate memory\n");
         return NULL;
     }
     node->next = NULL;
@@ -40,8 +41,8 @@ list_status_t freeList(list_t* list){
     while(walk){
         node_t* next = walk->next;
         
-        free(walk);
         printf("element memory freed at %p\n", (void*)walk);
+        free(walk);
         
         walk = next;
     }
@@ -145,18 +146,18 @@ list_status_t listPopBack(list_t* list){
         return LIST_STATUS_OK;
     }
 
-    node_t* walk = list->head;
     node_t* prev = NULL;
-    while(walk->next){
-        prev = walk;
-        walk = walk->next;
+    node_t* curr = list->head;
+    while(curr->next){
+        prev = curr;
+        curr = curr->next;
     }
 
     list->tail = prev;
     list->tail->next = NULL;
     list->size--;
 
-    free(walk);
+    free(curr);
     return LIST_STATUS_OK;
 }
 
@@ -177,7 +178,7 @@ list_status_t listRemoveAt(list_t* list, size_t location){
         prev = prev->next;
     }
 
-    node_t*curr = prev->next;
+    node_t* curr = prev->next;
 
     free(curr);
     list->size--;
@@ -235,7 +236,7 @@ int listIsCircular(const list_t* list){
 
 list_status_t listForEach(const list_t* list, list_iterate_func func, void* user){
     if(!list || !func) return LIST_STATUS_INVALID;
-    if(listIsEmpty(list)) return LIST_STATUS_EMPTY;
+    if(list->head == NULL) return LIST_STATUS_EMPTY;
     
     node_t* walk = list->head;
     while(walk){
@@ -253,7 +254,7 @@ list_status_t listReverse(list_t* list){
     node_t* curr = list->head;
     node_t* next = NULL;
 
-    for(size_t i = 0; i < list->size; i++){
+    while(curr){
         next = curr->next;
         curr->next = prev;
         prev = curr;
@@ -265,9 +266,9 @@ list_status_t listReverse(list_t* list){
     return LIST_STATUS_OK;
 }
 
-list_status_t displayList(list_t* list, list_print_func display){
+list_status_t listDisplay(list_t* list, list_print_func display){
     if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(list->head == NULL) return LIST_STATUS_EMPTY;
 
     node_t* walk = list->head;
     printf("\n");
@@ -277,4 +278,59 @@ list_status_t displayList(list_t* list, list_print_func display){
         walk = walk->next;
     }
     printf("NULL\n");
+}
+
+list_status_t listCompare(list_t* list1, list_t* list2){
+    if(!list1 || !list2) return LIST_STATUS_INVALID;
+    
+    node_t* node1 = list1->head;
+    node_t* node2 = list2->head;
+
+    while(node1 && node2){
+        if(node1->data != node2->data) return LIST_STATUS_NOT_IDENTICAL;
+        node1 = node1->next;
+        node2 = node2->next;
+    }
+
+    if(node1 == NULL && node2 == NULL) return LIST_STATUS_IDENTICAL;
+    else return LIST_STATUS_NOT_IDENTICAL;
+}
+
+list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
+    if(!list || !node || !location) return LIST_STATUS_INVALID;
+
+    node_t* prev = NULL;
+    node_t* curr = list->head;
+
+    size_t index = 0;
+
+    while(curr && curr != node){
+        prev = curr;
+        curr = curr->next;
+        index++;
+    }
+    if(!curr) return LIST_STATUS_NOT_FOUND;
+
+    if(prev == NULL)
+        list->head = node->next;
+    else
+        prev->next = node->next;
+
+    if(index < location)
+        location--;
+    if(location == 0){
+        node->next = list->head;
+        list->head = node;
+        return LIST_STATUS_OK;
+    }
+    
+    node_t* walk = list->head;
+    for(size_t i = 0; i < location - 1; i++){
+        walk = walk->next;
+    }
+
+    node->next = walk->next;
+    walk->next = node;
+
+    return LIST_STATUS_OK;
 }
