@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "linkedlist.h"
 
 node_t* newNode(void* value){
@@ -266,14 +264,34 @@ list_status_t listReverse(list_t* list){
     return LIST_STATUS_OK;
 }
 
-list_status_t listDisplay(list_t* list, list_print_func display){
+list_status_t listDisplay(list_t* list, value_type type){
     if(!list) return LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY;
 
     node_t* walk = list->head;
     printf("\n");
     while(walk){
-        display(walk->data);
+        switch(type){
+            case INT:
+                printf("%d", *(int*)walk);
+                break;
+            case FLOAT:
+                printf("%f", *(float*)walk);
+                break;
+            case CHAR:
+                printf("%c", *(char*)walk);
+                break;
+            case STRING:
+                printf("%s", (char*)walk);
+                break;
+            case BOOL:
+                printf("%s", *(bool*)walk ? "true" : "false");
+                break;
+            default:
+                printf("invalid type");
+                return LIST_STATUS_INVALID;
+        }
+        
         printf(" -> ");
         walk = walk->next;
     }

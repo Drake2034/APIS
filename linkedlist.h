@@ -46,14 +46,19 @@
             return !match(element, data);
         }
 
+        //to work on
         list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
         list_status_t listFindIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
 
-    typedef void (*list_print_func)(void* data);
-        //to work on
-        void printer(void* data){}
+    typedef enum{
+        INT,
+        FLOAT,
+        CHAR,
+        STRING,
+        BOOL
+    }value_type;
 
-        list_status_t displayList(list_t* list, list_print_func func);
+    list_status_t listDisplay(list_t* list, value_type type);
 
     node_t* newNode(void* data);
     void freeNode(node_t* node);
