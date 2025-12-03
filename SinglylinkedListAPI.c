@@ -208,9 +208,24 @@ list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* us
     return LIST_STATUS_NOT_FOUND;
 }
 
-size_t listSize(const list_t* list){
-    if(!list) return 0;
-    return list->size;
+list_status_t listClone(const list_t* list, list_t** output){
+    if(!list || !output) return LIST_STATUS_INVALID;
+
+    if(list->head == NULL) {
+        *output = initList();
+        if(!*output) return LIST_STATUS_NO_MEMORY;
+    }
+
+    list_t* clonedList = initList();
+    if(!clonedList) return LIST_STATUS_NO_MEMORY;
+
+    node_t* walk = list->head;
+    while(walk){
+        listPushBack(clonedList, walk->data);
+        walk = walk->next;
+    }
+    *output = clonedList;
+    return LIST_STATUS_OK;
 }
 
 int listIsEmpty(const list_t* list){
