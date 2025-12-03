@@ -1,7 +1,7 @@
 #include "linkedlist.h"
 
 node_t* newNode(void* value){
-    node_t* node = (node_t*)malloc(sizeof(node_t));
+    node_t* node = malloc(sizeof(node_t));
     if(!node){
         printf("couldn't allocate memory\n");
         return NULL;
@@ -19,7 +19,7 @@ static void freeNode(node_t* node){
 }
 
 list_t* initList(void){
-    list_t* list = (list_t*)malloc(sizeof(list_t));
+    list_t* list = malloc(sizeof(list_t));
     if(!list){
         printf("couldn't allocate memory\n");
         return NULL;
@@ -55,7 +55,7 @@ list_status_t freeList(list_t* list){
 list_status_t listPushFront(list_t* list, void* value){
     if(!list) return LIST_STATUS_INVALID;
 
-    node_t* nodeToPush = (node_t*)malloc(sizeof(node_t));
+    node_t* nodeToPush = malloc(sizeof(node_t));
     if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
 
     nodeToPush->data = value;
@@ -73,7 +73,7 @@ list_status_t listPushFront(list_t* list, void* value){
 list_status_t listPushBack(list_t* list, void* value){
     if(!list) return LIST_STATUS_INVALID;
 
-    node_t* nodeToPush = (node_t*)malloc(sizeof(node_t));
+    node_t* nodeToPush = malloc(sizeof(node_t));
     if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
 
     nodeToPush->data = value;
@@ -100,7 +100,7 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
         return listPushBack(list, value);
 
  
-    node_t* nodeToInsert = (node_t*)malloc(sizeof(node_t));
+    node_t* nodeToInsert = malloc(sizeof(node_t));
     if(!nodeToInsert) return LIST_STATUS_NO_MEMORY;
     nodeToInsert->data = value;
 
