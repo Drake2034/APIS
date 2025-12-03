@@ -76,7 +76,7 @@
     list_status_t listRemoveAt(list_t* list, size_t location);
 
     list_status_t listClone(const list_t* list, list_t** output);
-    
+
     size_t listSize(const list_t* list);
     int listIsEmpty(const list_t* list);
     int listIsCircular(const list_t* list);
@@ -84,7 +84,6 @@
     list_status_t listReverse(list_t* list);
     
     typedef void (*list_merge_func)(list_t* list_1, list_t* list_2);
-        //to work on
         list_t* merge(list_t* list_1, list_t* list_2);
         list_t* merge_alternate(list_t* list_1, list_t* list_2);
     list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func);

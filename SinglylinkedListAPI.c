@@ -228,6 +228,11 @@ list_status_t listClone(const list_t* list, list_t** output){
     return LIST_STATUS_OK;
 }
 
+size_t listSize(list_t* list){
+    if(!list) return 0;
+    return list->size;
+}
+
 int listIsEmpty(const list_t* list){
     if(!list) return 1;
     return (list->head == NULL);
@@ -365,5 +370,60 @@ list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
     node->next = walk->next;
     walk->next = node;
 
+    return LIST_STATUS_OK;
+}
+
+list_status_t merge(list_t* list_1, list_t* list_2){
+    if(!list_1 || !list_2) return LIST_STATUS_INVALID;
+
+    if(list_2->head == NULL) return LIST_STATUS_OK;
+
+    if(list_1->head == NULL){
+        list_1->head = list_2->head;
+        list_1->tail = list_2->tail; 
+    }else{
+        list_1->tail->next = list_2->head;
+        list_1->tail = list_2->tail;
+    }
+
+    list_1->size += list_2->size;
+    
+    list_2->head = NULL;
+    list_2->tail = NULL;
+    list_2->size = 0;
+
+    return LIST_STATUS_OK;
+}
+list_status_t merge_alternate(list_t* list_1, list_t* list_2){
+    if(!list_1 || !list_2) return LIST_STATUS_INVALID;
+
+    if(list_1->head == NULL) return merge(list_1, list_2);
+    if(list_2->head == NULL) return LIST_STATUS_OK;
+
+    node_t* walk_1 = list_1->head;
+    node_t* walk_2 = list_2->head;
+    while(walk_1 && walk_2){
+        walk_1->next = walk_2;
+        if(!walk_1) break;
+        walk_2->next = walk_1-next;
+         
+        walk_1 = walk_1->next;
+        walk_2 = walk_2->next;
+    }
+
+    list_1->size += list_2->size;
+    
+    list_2->head = NULL;
+    list_2->tail = NULL;
+    list_2->size = 0;
+
+    return LIST_STATUS_OK;
+}
+
+list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func){
+    if(!list_1 || !list_2) return LIST_STATUS_EMPTY;
+    if(!func) return LIST_STATUS_INVALID;
+
+    func(list_1, list_2)
     return LIST_STATUS_OK;
 }
