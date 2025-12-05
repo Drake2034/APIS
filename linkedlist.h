@@ -26,12 +26,8 @@
         list_status_t listForEach(const list_t* list, list_iterate_func func, void* user);
 
     typedef bool (*list_predicate_func)(void* element, void* user_data);
-        bool match(void* element, void* data){
-            return *(int*)element == *(int*)data;
-        }
-        bool not_match(void* element, void* data){
-            return !match(element, data);
-        }
+        bool match(void* element, void* data){return *(int*)element == *(int*)data;}
+        bool not_match(void* element, void* data){return !match(element, data);}
 
     typedef bool (*list_select_func)(void*data, size_t index, size_t size);
         bool select_first(void* data, size_t index, size_t size){return index == 0;}

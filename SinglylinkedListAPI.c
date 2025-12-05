@@ -74,14 +74,18 @@ list_status_t listPushFront(list_t* list, void* value){
     if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
 
     nodeToPush->data = value;
-    nodeToPush->next = list->head;
-
-    list->head = nodeToPush;
     
     if(list->tail == NULL){
-        list->tail = nodeToPush;
+        nodeToPush->next = NULL;
+        list->head = list->tail = nodeToPush;
+        list->size++;
+        return LIST_STATUS_OK;
     }
+
+    nodeToPush->next = list->head;
+    list->head = nodeToPush;
     list->size++;
+
     return LIST_STATUS_OK;
 }
 
@@ -95,12 +99,16 @@ list_status_t listPushBack(list_t* list, void* value){
     nodeToPush->next = NULL;
 
     if(list->tail == NULL){
+        nodeToPush->next = NULL;
         list->head = list->tail = nodeToPush;
-    }else{
-        list->tail->next = nodeToPush;
-        list->tail = nodeToPush;
+        list->size++;
+        return LIST_STATUS_OK;
     }
+    
+    list->tail->next = nodeToPush;
+    list->tail = nodeToPush;
     list->size++;
+
     return LIST_STATUS_OK;
 }
 
@@ -114,15 +122,14 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     if(location == list->size)
         return listPushBack(list, value);
 
- 
     node_t* nodeToInsert = malloc(sizeof(node_t));
     if(!nodeToInsert) return LIST_STATUS_NO_MEMORY;
+
     nodeToInsert->data = value;
 
     node_t* curr = list->head;
-    for(size_t i = 0; i < location - 1; ++i){
-        curr = curr->next;
-    }
+    for(size_t i = 0; i < location - 1; i++, curr = curr->next);
+    
     node_t* next = curr->next;
 
     curr->next = nodeToInsert;
