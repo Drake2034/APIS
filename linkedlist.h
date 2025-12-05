@@ -15,21 +15,7 @@
         LIST_STATUS_NOT_IDENTICAL
     }list_status_t;
 
-    enum flags{
-        LIST_FIRST = 1,
-        LIST_MIDDLE = 2,
-        LIST_LAST = 3,
-        LIST_FIRST_HALF = 4,
-        LIST_SECOND_HALF = 5,
-        LIST_ALL = 6
-    };
-    
-    typedef struct node{
-        void* data;
-        struct node* next;
-    }node_t;
-
-    typedef struct singlylist{
+    typedef struct list{
         node_t* head;
         node_t* tail;
         size_t size;
@@ -47,9 +33,18 @@
             return !match(element, data);
         }
 
-        //to work on
-        list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
-        list_status_t listFindIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags);
+    typedef bool (*list_select_func)(void*data, size_t index, size_t size);
+        bool select_first(void* data, size_t index, size_t size){return index == 0;}
+        bool select_last(void* data, size_t index, size_t size){return index == size - 1;}
+        bool select_mid(void* data, size_t index, size_t size){return index == size / 2;}
+
+        bool select_first_half(void* data, size_t index, size_t size){return index < size / 2;}
+        bool select_second_half(void* data, size_t index, size_t size){return index >= size/2;}
+
+        bool select_all(void* data, size_t index, size_t size){return true;}
+
+        list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data);
+        list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output);
 
     typedef enum{
         INT,
@@ -65,7 +60,7 @@
     void freeNode(node_t* node);
 
     list_t* initList(void);
-    list_status_t freeList(list_t *list);
+    list_status_t freeList(list_t* list);
 
     list_status_t listPushFront(list_t* list, void* value);
     list_status_t listPushBack(list_t* list, void* value);
@@ -84,7 +79,7 @@
     list_status_t listReverse(list_t* list);
     
     typedef void (*list_merge_func)(list_t* list_1, list_t* list_2);
-        list_t* merge(list_t* list_1, list_t* list_2);
-        list_t* merge_alternate(list_t* list_1, list_t* list_2);
+        list_status_t merge(list_t* list_1, list_t* list_2);
+        list_status_t merge_alternate(list_t* list_1, list_t* list_2);
     list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func);
 #endif

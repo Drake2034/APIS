@@ -1,27 +1,41 @@
+#include <stdio.h>
 #include "linkedlist.h"
+typedef struct node{
+    void* data;
+    struct node* next;
+}node_t;
 
 node_t* newNode(void* value){
     node_t* node = malloc(sizeof(node_t));
     if(!node){
-        printf("couldn't allocate memory\n");
+        fprintf(stderr, "Couldn't allocate memory\n");
         return NULL;
     }
+
     node->next = NULL;
     node->data = value;
+
+    printf("node memory allocated at %p\n", (void*)node);
     return node;
 }
 
 static void freeNode(node_t* node){
     if(!node) return;
 
-    printf("node memory freed at %p\n", (void*) node);
+    if(node->data){
+        free(node->data);
+        node->data = NULL;
+    }
+    node->next = NULL;
+
+    printf("node memory freed at %p\n", (void*)node);
     free(node);
 }
 
 list_t* initList(void){
     list_t* list = malloc(sizeof(list_t));
     if(!list){
-        printf("couldn't allocate memory\n");
+        fprintf(stderr, "couldn't allocate memory\n");
         return NULL;
     }
 
@@ -40,7 +54,7 @@ list_status_t freeList(list_t* list){
         node_t* next = walk->next;
         
         printf("element memory freed at %p\n", (void*)walk);
-        free(walk);
+        freeNode(walk);
         
         walk = next;
     }
@@ -49,6 +63,7 @@ list_status_t freeList(list_t* list){
     list->size = 0;
 
     printf("list freed at %p\n", (void*)list);
+    free(list);
     return LIST_STATUS_OK;
 }
 
@@ -183,14 +198,31 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     return LIST_STATUS_OK;
 }
 
-list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data, int flags){
-    if(!list || !pred_func) return LIST_STATUS_INVALID;
+list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
+    if(!list || !output) return LIST_STATUS_INVALID;
+    if(list->head == NULL) return LIST_STATUS_EMPTY;
+
+    node_t* walk = list->head;
+    size_t i = 0;
+    while(walk){
+        if(func(walk->data, i, list->size)){
+            listPushBack(output, walk->data);
+        }
+        walk = walk->next;
+        i++;
+    }
+
+    return LIST_STATUS_OK;
+}
+
+list_status_t listRemoveIf(list_t* list, list_predicate_func func, void* user_data){
+    if(!list || !func || !user_data) return LIST_STATUS_INVALID;
     if(list->head == NULL) return LIST_STATUS_EMPTY; 
 
     node_t* prev = NULL;
     node_t* curr = list->head;
     while(curr){
-        if(pred_func(curr->data, user_data)){
+        if(func(curr->data, user_data)){
             if(prev)
                 prev->next = curr->next;
             else
@@ -206,6 +238,19 @@ list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* us
     }
 
     return LIST_STATUS_NOT_FOUND;
+}
+
+list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output){
+    if(!list || !pred_func || !select_func || !user_data || !output) return LIST_STATUS_INVALID;
+    if(list->head == NULL) return LIST_STATUS_EMPTY;
+
+    node_t* walk = list->head;
+    while(walk){
+        if(pred_func(walk->data, user_data)){
+            listSelect(list, select_func, output);
+        }
+        walk = walk->next;
+    }
 }
 
 list_status_t listClone(const list_t* list, list_t** output){
@@ -228,7 +273,7 @@ list_status_t listClone(const list_t* list, list_t** output){
     return LIST_STATUS_OK;
 }
 
-size_t listSize(list_t* list){
+size_t listSize(const list_t* list){
     if(!list) return 0;
     return list->size;
 }
@@ -394,6 +439,7 @@ list_status_t merge(list_t* list_1, list_t* list_2){
 
     return LIST_STATUS_OK;
 }
+
 list_status_t merge_alternate(list_t* list_1, list_t* list_2){
     if(!list_1 || !list_2) return LIST_STATUS_INVALID;
 
@@ -405,7 +451,7 @@ list_status_t merge_alternate(list_t* list_1, list_t* list_2){
     while(walk_1 && walk_2){
         walk_1->next = walk_2;
         if(!walk_1) break;
-        walk_2->next = walk_1-next;
+        walk_2->next = walk_1->next;
          
         walk_1 = walk_1->next;
         walk_2 = walk_2->next;
@@ -424,6 +470,6 @@ list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func){
     if(!list_1 || !list_2) return LIST_STATUS_EMPTY;
     if(!func) return LIST_STATUS_INVALID;
 
-    func(list_1, list_2)
+    func(list_1, list_2);
     return LIST_STATUS_OK;
 }
