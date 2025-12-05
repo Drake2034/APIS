@@ -34,7 +34,7 @@ static void freeNode(node_t* node){
     free(node);
 }
 
-list_t* initList(){
+list_t* initList(void){
     list_t* list = malloc(sizeof(list_t));
     if(!list){
         fprintf(stderr, "couldn't allocate memory\n");

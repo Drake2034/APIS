@@ -15,6 +15,7 @@
         LIST_STATUS_NOT_IDENTICAL
     }list_status_t;
 
+    //to fix
     typedef struct list{
         node_t* head;
         node_t* tail;
@@ -78,4 +79,10 @@
         list_status_t merge(list_t* list_1, list_t* list_2);
         list_status_t merge_alternate(list_t* list_1, list_t* list_2);
     list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func);
+
+    list_status_t listIsSorted();
+    typedef void (*list_sort_func)(list_t* list);
+        list_status_t listSort_insertion();
+        list_status_t listSort_bubble();
+        list_status_t listSort_selection();
 #endif
