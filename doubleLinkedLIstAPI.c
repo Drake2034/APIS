@@ -117,6 +117,8 @@ list_status_t listPushBack(list_t* list, void* value){
     list->tail->next = nodeToPush;
     list->tail = nodeToPush;
     list->size++;
+
+    return LIST_STATUS_OK;
 }
 
 list_status_t listInsertAt(list_t* list, size_t location, void* value){
