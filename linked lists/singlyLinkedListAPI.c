@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "linkedlist.h"
+
 typedef struct node{
     void* data;
     struct node* next;
@@ -141,11 +142,10 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
 
 list_status_t listPopFront(list_t* list){
     if(!list) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     node_t* node = list->head;
     list->head = node->next;
-    if(list->head == NULL) list->tail = NULL;
 
     list->size--;
 
@@ -155,7 +155,7 @@ list_status_t listPopFront(list_t* list){
 
 list_status_t listPopBack(list_t* list){
     if(!list) LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     if(list->head == list->tail){
         node_t* node = list->head;
@@ -178,12 +178,13 @@ list_status_t listPopBack(list_t* list){
     list->size--;
 
     free(curr);
+
     return LIST_STATUS_OK;
 }
 
 list_status_t listRemoveAt(list_t* list, size_t location){
     if(!list) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     if(location >= list->size)
         return LIST_STATUS_INVALID;
@@ -193,21 +194,19 @@ list_status_t listRemoveAt(list_t* list, size_t location){
         return listPopBack(list);
     
     node_t* prev = list->head;
-
-    for(size_t i = 0; i < location - 1; ++i){
+    for(size_t i = 0; i < location - 1; i++)
         prev = prev->next;
-    }
-
     node_t* curr = prev->next;
 
     free(curr);
     list->size--;
+
     return LIST_STATUS_OK;
 }
 
 list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
     if(!list || !output) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     node_t* walk = list->head;
     size_t i = 0;
@@ -224,7 +223,7 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
 
 list_status_t listRemoveIf(list_t* list, list_predicate_func func, void* user_data){
     if(!list || !func || !user_data) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY; 
+    if(!list->head) return LIST_STATUS_EMPTY; 
 
     node_t* prev = NULL;
     node_t* curr = list->head;
@@ -249,7 +248,7 @@ list_status_t listRemoveIf(list_t* list, list_predicate_func func, void* user_da
 
 list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output){
     if(!list || !pred_func || !select_func || !user_data || !output) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     node_t* walk = list->head;
     while(walk){
@@ -263,7 +262,7 @@ list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_selec
 list_status_t listClone(const list_t* list, list_t** output){
     if(!list || !output) return LIST_STATUS_INVALID;
 
-    if(list->head == NULL) {
+    if(!list->head) {
         *output = initList();
         if(!*output) return LIST_STATUS_NO_MEMORY;
     }
@@ -287,7 +286,7 @@ size_t listSize(const list_t* list){
 
 int listIsEmpty(const list_t* list){
     if(!list) return 1;
-    return (list->head == NULL);
+    return (!list->head);
 }
 
 int listIsCircular(const list_t* list){
@@ -306,7 +305,7 @@ int listIsCircular(const list_t* list){
 
 list_status_t listForEach(const list_t* list, list_iterate_func func, void* user){
     if(!list || !func) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
     
     node_t* walk = list->head;
     while(walk){
@@ -318,7 +317,7 @@ list_status_t listForEach(const list_t* list, list_iterate_func func, void* user
 
 list_status_t listReverse(list_t* list){
     if(!list) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY; 
+    if(!list->head) return LIST_STATUS_EMPTY; 
 
     node_t* prev = NULL;
     node_t* curr = list->head;
@@ -338,7 +337,7 @@ list_status_t listReverse(list_t* list){
 
 list_status_t listDisplay(list_t* list, value_type type){
     if(!list) return LIST_STATUS_INVALID;
-    if(list->head == NULL) return LIST_STATUS_EMPTY;
+    if(!list->head) return LIST_STATUS_EMPTY;
 
     node_t* walk = list->head;
     printf("\n");

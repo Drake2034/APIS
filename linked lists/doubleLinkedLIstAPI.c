@@ -150,3 +150,71 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     list->size++;
     return LIST_STATUS_OK;
 }
+
+list_status_t listPopFront(list_t* list){
+    if(!list) return LIST_STATUS_INVALID;
+    if(!list->head) return LIST_STATUS_EMPTY;
+
+    node_t* node = list->head;
+
+    list->head = node->next;
+    list->head->prev = NULL;
+
+    list->size--;
+
+    free(node);
+    return LIST_STATUS_OK;
+}
+
+list_status_t listPopBack(list_t* list){
+    if(!list) return LIST_STATUS_INVALID;
+    if(!list->head) return LIST_STATUS_EMPTY;
+
+    if(list->head == list->tail){
+        node_t* node = list->head;
+        list->head = list->tail = NULL;
+
+        list->size = 0;
+        free(node);
+        return LIST_STATUS_OK;
+    }
+
+    node_t* curr = list->head;
+    while(curr->next){
+        curr = curr->next;
+    }
+
+    list->tail = curr->prev;
+    list->tail->next = NULL;
+    list->tail->prev = curr->prev;
+    list->size--;
+
+    curr->prev = NULL;
+    free(curr);
+
+    return LIST_STATUS_OK;
+}
+
+list_status_t listRemoveAt(list_t* list, size_t location){
+    if(!list) return LIST_STATUS_INVALID;
+    if(!list->head) return LIST_STATUS_EMPTY;
+
+    if(location >= list->size)
+        return LIST_STATUS_INVALID;
+    if(location == 0)
+        return listPopFront(list);
+    if(location == list->size - 1)
+        return listPopBack(list);
+
+    node_t* walk = list->head;
+    for(size_t i = 0; i < location; i++)
+        walk = walk->next;
+
+    walk->prev->next = walk->next;
+    walk->next->prev = walk->prev;
+
+    free(walk);
+    list->size--;
+
+    return LIST_STATUS_OK;
+}   
