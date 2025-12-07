@@ -40,7 +40,8 @@
 
         bool select_all(void* data, size_t index, size_t size){return true;}
 
-        list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, void* user_data);
+        //rewrok
+        list_status_t listRemoveIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output);
         list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output);
 
     typedef enum{

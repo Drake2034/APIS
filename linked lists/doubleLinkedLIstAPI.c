@@ -217,4 +217,41 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     list->size--;
 
     return LIST_STATUS_OK;
-}   
+}
+
+list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
+    if(!list || !output) return LIST_STATUS_INVALID;
+    if(!list->head) return LIST_STATUS_EMPTY;
+
+    node_t* walk = list->head;
+    size_t i = 0;
+    while(walk){
+        if(func(walk->data, i, list->size)){
+            listPushBack(output, walk->data);
+        }
+        walk = walk->next;
+        i++;
+    }
+
+    return LIST_STATUS_OK;
+}
+
+list_status_t listClone(const list_t* list, list_t** output){
+    if(!list || !output) return LIST_STATUS_INVALID;
+
+    if(!list->head){
+        *output = initList();
+        if(!*output) return LIST_STATUS_NO_MEMORY;
+    }
+
+    list_t* clonedList = initList();
+    if(!clonedList) return LIST_STATUS_NO_MEMORY;
+
+    node_t* walk = list->head;
+    while(walk){
+        listPushBack(clonedList, walk);
+        walk = walk->next;
+    }
+    *output = clonedList;
+    return LIST_STATUS_OK;
+}
