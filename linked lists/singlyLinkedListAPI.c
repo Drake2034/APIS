@@ -370,20 +370,19 @@ list_status_t listDisplay(list_t* list, value_type type){
     printf("NULL\n");
 }
 
-list_status_t listCompare(list_t* list1, list_t* list2){
-    if(!list1 || !list2) return LIST_STATUS_INVALID;
+int listCompare(list_t* list1, list_t* list2){
+    if(!list1 || !list2) return 0;
     
     node_t* node1 = list1->head;
     node_t* node2 = list2->head;
 
     while(node1 && node2){
-        if(node1->data != node2->data) return LIST_STATUS_NOT_IDENTICAL;
+        if(node1->data != node2->data) return 0;
         node1 = node1->next;
         node2 = node2->next;
     }
 
-    if(node1 == NULL && node2 == NULL) return LIST_STATUS_IDENTICAL;
-    else return LIST_STATUS_NOT_IDENTICAL;
+    return (node1 == NULL && node2 == NULL) ? 1 : 0;
 }
 
 list_status_t listMoveTo(list_t* list, node_t* node, size_t location){

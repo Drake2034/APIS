@@ -131,3 +131,36 @@ stack_status_t stack_reverse(stack_t* stack){
 
     return STACK_OK;
 }
+
+stack_status_t stack_clone(stack_t* stack, stack_t* output){
+    if(!stack || !output) return STACK_ERROR_NULL;
+    if(!stack->stack_ptr) return STACK_ERROR_EMPTY;
+
+    stack_t* clonedStack = stack_create();
+    if(!clonedStack) return STACK_ERROR_ALLOC;
+
+    node_t* walk = stack->stack_ptr;
+    while(walk){
+        stack_push(clonedStack, walk->data);
+        walk = walk->next;
+    }
+
+    stack_reverse(clonedStack);
+    output = clonedStack;
+
+    return STACK_OK;
+}
+
+int stack_compare(stack_t* stack_1, stack_t* stack_2){
+    if(!stack_1 || !stack_2) return 0;
+
+    node_t* node1 = stack_1->stack_ptr;
+    node_t* node2 = stack_2->stack_ptr;
+    while(node1 && node2){
+        if(node1->data != node2->data) return 0;
+        node1 = node1->next;
+        node2 = node2->next;
+    }
+
+    return (node1 == NULL && node2 == NULL) ? 1 : 0;
+}
