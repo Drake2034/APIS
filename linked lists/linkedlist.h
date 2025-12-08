@@ -1,16 +1,15 @@
 #ifndef LINKEDLIST_H
     #define LINKEDLIST_H
+
+    #include <stdio.h>
     #include <stddef.h>
     #include <stdbool.h>
 
     typedef enum{
-        LIST_STATUS_OK = 0,
-        LIST_STATUS_ERR,
-        LIST_STATUS_NO_MEMORY,
-        LIST_STATUS_INVALID,
-        LIST_STATUS_EMPTY,
-        LIST_STATUS_FOUND,
-        LIST_STATUS_NOT_FOUND,
+        LIST_OK = 0,
+        LIST_ERR_ALLOC,
+        LIST_ERR_NULL,
+        LIST_EMPTY
     }list_status_t;
 
     typedef struct list{
@@ -51,7 +50,6 @@
 
     list_status_t listDisplay(list_t* list, value_type type);
 
-    node_t* newNode(void* data);
     void freeNode(node_t* node);
 
     list_t* initList(void);
@@ -68,8 +66,8 @@
     list_status_t listClone(const list_t* list, list_t** output);
 
     size_t listSize(const list_t* list);
-    int listIsEmpty(const list_t* list);
-    int listIsCircular(const list_t* list);
+    bool listIsEmpty(const list_t* list);
+    bool listIsCircular(const list_t* list);
 
     list_status_t listReverse(list_t* list);
     

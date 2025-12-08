@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "linkedlist.h"
 
 typedef struct node{
@@ -6,20 +5,6 @@ typedef struct node{
     struct node* next;
     struct node* prev;
 }node_t;
-
-node_t* newNode(void* data){
-    node_t* node = malloc(sizeof(node_t));
-    if(!node){
-        fprintf(stderr, "Couldn't allocate memory\n");
-        return NULL;
-    }
- 
-    node->next = node->prev = NULL;
-    node->data = data;
-
-    printf("node memory allocated at %p\n", (void*)node);
-    return node;
-}
 
 static void freeNode(node_t* node){
     if(!node) return;
@@ -49,7 +34,7 @@ list_t* initList(void){
 }
 
 list_status_t freeList(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     node_t* walk = list->head;
     while(walk){
@@ -64,17 +49,17 @@ list_status_t freeList(list_t* list){
     list->head = list->tail = NULL;
     list->size = 0;
 
-    printf("list freed at %p\n", (void*)list);
+    printf("list memory freed at %p\n", (void*)list);
     free(list);
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPushFront(list_t* list, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToPush) return LIST_ERR_ALLOC;
 
     nodeToPush->data = value;
     nodeToPush->prev = NULL;
@@ -84,7 +69,8 @@ list_status_t listPushFront(list_t* list, void* value){
 
         list->head = list->tail = nodeToPush;
         list->size++;
-        return LIST_STATUS_OK;
+
+        return LIST_OK;
     }
 
     nodeToPush->next = list->head;
@@ -92,14 +78,14 @@ list_status_t listPushFront(list_t* list, void* value){
     list->head->prev = nodeToPush;
     list->head = nodeToPush;
     list->size++;
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPushBack(list_t* list, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToPush) return LIST_ERR_ALLOC;
 
     nodeToPush->data = value;
     nodeToPush->next = NULL;
@@ -109,7 +95,8 @@ list_status_t listPushBack(list_t* list, void* value){
 
         list->head = list->tail = nodeToPush;
         list->size++;
-        return LIST_STATUS_OK;
+        
+        return LIST_OK;
     }
 
     nodeToPush->prev = list->tail;
@@ -118,21 +105,21 @@ list_status_t listPushBack(list_t* list, void* value){
     list->tail = nodeToPush;
     list->size++;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listInsertAt(list_t* list, size_t location, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     if(location > list->size)
-        return LIST_STATUS_INVALID;
+        return LIST_ERR_NULL;
     if(location = 0)
         return listPushFront(list, value);
     if(location == list->size)
         return listPushBack(list, value);
 
     node_t* nodeToInsert = malloc(sizeof(node_t));
-    if(!nodeToInsert) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToInsert) return LIST_ERR_ALLOC;
 
     nodeToInsert->data = value;
 
@@ -148,12 +135,12 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     curr->next = nodeToInsert;
 
     list->size++;
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPopFront(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* node = list->head;
 
@@ -163,12 +150,12 @@ list_status_t listPopFront(list_t* list){
     list->size--;
 
     free(node);
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPopBack(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     if(list->head == list->tail){
         node_t* node = list->head;
@@ -176,7 +163,7 @@ list_status_t listPopBack(list_t* list){
 
         list->size = 0;
         free(node);
-        return LIST_STATUS_OK;
+        return LIST_OK;
     }
 
     node_t* curr = list->head;
@@ -192,15 +179,15 @@ list_status_t listPopBack(list_t* list){
     curr->prev = NULL;
     free(curr);
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listRemoveAt(list_t* list, size_t location){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     if(location >= list->size)
-        return LIST_STATUS_INVALID;
+        return LIST_ERR_NULL;
     if(location == 0)
         return listPopFront(list);
     if(location == list->size - 1)
@@ -216,12 +203,12 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     free(walk);
     list->size--;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
-    if(!list || !output) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list || !output) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* walk = list->head;
     size_t i = 0;
@@ -233,19 +220,19 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
         i++;
     }
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listClone(const list_t* list, list_t** output){
-    if(!list || !output) return LIST_STATUS_INVALID;
+    if(!list || !output) return LIST_ERR_NULL;
 
     if(!list->head){
         *output = initList();
-        if(!*output) return LIST_STATUS_NO_MEMORY;
+        if(!*output) return LIST_ERR_ALLOC;
     }
 
     list_t* clonedList = initList();
-    if(!clonedList) return LIST_STATUS_NO_MEMORY;
+    if(!clonedList) return LIST_ERR_ALLOC;
 
     node_t* walk = list->head;
     while(walk){
@@ -253,5 +240,28 @@ list_status_t listClone(const list_t* list, list_t** output){
         walk = walk->next;
     }
     *output = clonedList;
-    return LIST_STATUS_OK;
+    return LIST_OK;
+}
+
+size_t listSize(const list_t* list){
+    return list ? list->size : 0;
+}
+
+bool listIsEmpty(const list_t* list){
+    return (!list) || (!list->head);
+}
+
+bool listIsCircular(const list_t* list){
+    if(!list || !list->head) return false;
+
+    node_t* slowPtr = list->head;
+    node_t* fastPtr = list->head;
+
+    while(slowPtr && fastPtr->next){
+        if(slowPtr == fastPtr) return true;
+
+        slowPtr = slowPtr->next;
+        fastPtr = fastPtr->next->next;
+    }
+    return false;
 }

@@ -6,20 +6,6 @@ typedef struct node{
     struct node* next;
 }node_t;
 
-node_t* newNode(void* value){
-    node_t* node = malloc(sizeof(node_t));
-    if(!node){
-        fprintf(stderr, "Couldn't allocate memory\n");
-        return NULL;
-    }
-
-    node->next = NULL;
-    node->data = value;
-
-    printf("node memory allocated at %p\n", (void*)node);
-    return node;
-}
-
 static void freeNode(node_t* node){
     if(!node) return;
 
@@ -48,7 +34,7 @@ list_t* initList(void){
 }
 
 list_status_t freeList(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
     
     node_t* walk = list->head;
     while(walk){
@@ -63,38 +49,42 @@ list_status_t freeList(list_t* list){
     list->head = list->tail = NULL;
     list->size = 0;
 
-    printf("list freed at %p\n", (void*)list);
+    printf("list memory freed at %p\n", (void*)list);
     free(list);
-    return LIST_STATUS_OK;
+
+    return LIST_OK;
 }
 
 list_status_t listPushFront(list_t* list, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToPush) return LIST_ERR_ALLOC;
 
     nodeToPush->data = value;
     
     if(list->tail == NULL){
         nodeToPush->next = NULL;
+
         list->head = list->tail = nodeToPush;
         list->size++;
-        return LIST_STATUS_OK;
+
+        return LIST_OK;
     }
 
     nodeToPush->next = list->head;
+
     list->head = nodeToPush;
     list->size++;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPushBack(list_t* list, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToPush) return LIST_ERR_ALLOC;
 
     nodeToPush->data = value;
     nodeToPush->next = NULL;
@@ -103,28 +93,28 @@ list_status_t listPushBack(list_t* list, void* value){
         nodeToPush->next = NULL;
         list->head = list->tail = nodeToPush;
         list->size++;
-        return LIST_STATUS_OK;
+        return LIST_OK;
     }
     
     list->tail->next = nodeToPush;
     list->tail = nodeToPush;
     list->size++;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listInsertAt(list_t* list, size_t location, void* value){
-    if(!list) return LIST_STATUS_INVALID;
+    if(!list) return LIST_ERR_NULL;
 
     if(location > list->size)
-        return LIST_STATUS_INVALID;
+        return LIST_ERR_NULL;
     if(location == 0)
         return listPushFront(list, value);
     if(location == list->size)
         return listPushBack(list, value);
 
     node_t* nodeToInsert = malloc(sizeof(node_t));
-    if(!nodeToInsert) return LIST_STATUS_NO_MEMORY;
+    if(!nodeToInsert) return LIST_ERR_ALLOC;
 
     nodeToInsert->data = value;
 
@@ -137,12 +127,12 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     nodeToInsert->next = next;
     list->size++;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPopFront(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* node = list->head;
     list->head = node->next;
@@ -150,12 +140,12 @@ list_status_t listPopFront(list_t* list){
     list->size--;
 
     free(node);
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listPopBack(list_t* list){
-    if(!list) LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     if(list->head == list->tail){
         node_t* node = list->head;
@@ -163,7 +153,7 @@ list_status_t listPopBack(list_t* list){
         list->size = 0;
 
         free(node);
-        return LIST_STATUS_OK;
+        return LIST_OK;
     }
 
     node_t* prev = NULL;
@@ -179,15 +169,15 @@ list_status_t listPopBack(list_t* list){
 
     free(curr);
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listRemoveAt(list_t* list, size_t location){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     if(location >= list->size)
-        return LIST_STATUS_INVALID;
+        return LIST_ERR_NULL;
     if(location == 0)
         return listPopFront(list);
     if(location == list->size - 1)
@@ -201,12 +191,12 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     free(curr);
     list->size--;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
-    if(!list || !output) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list || !output) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* walk = list->head;
     size_t i = 0;
@@ -218,7 +208,7 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
         i++;
     }
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 //rework
@@ -230,8 +220,8 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
 //     void* user_data,
 //     list_t** output){
 
-//     if(!list || !pred_func || !select_func || !user_data) return LIST_STATUS_INVALID;
-//     if(!list->head) return LIST_STATUS_EMPTY; 
+//     if(!list || !pred_func || !select_func || !user_data) return LIST_ERR_NULL;
+//     if(!list->head) return LIST_EMPTY; 
 
 //     node_t* prev = NULL;
 //     node_t* curr = list->head;
@@ -248,8 +238,8 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
 // }
 
 list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, list_t* output){
-    if(!list || !pred_func || !select_func || !user_data || !output) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list || !pred_func || !select_func || !user_data || !output) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* walk = list->head;
     while(walk){
@@ -261,15 +251,15 @@ list_status_t listFindIf(list_t* list, list_predicate_func pred_func, list_selec
 }
 
 list_status_t listClone(const list_t* list, list_t** output){
-    if(!list || !output) return LIST_STATUS_INVALID;
+    if(!list || !output) return LIST_ERR_NULL;
 
     if(!list->head) {
         *output = initList();
-        if(!*output) return LIST_STATUS_NO_MEMORY;
+        if(!*output) return LIST_ERR_ALLOC;
     }
 
     list_t* clonedList = initList();
-    if(!clonedList) return LIST_STATUS_NO_MEMORY;
+    if(!clonedList) return LIST_ERR_ALLOC;
 
     node_t* walk = list->head;
     while(walk){
@@ -277,48 +267,47 @@ list_status_t listClone(const list_t* list, list_t** output){
         walk = walk->next;
     }
     *output = clonedList;
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 size_t listSize(const list_t* list){
-    if(!list) return 0;
-    return list->size;
+    return list ? list->size : 0;
 }
 
-int listIsEmpty(const list_t* list){
-    if(!list) return 1;
-    return (!list->head);
+bool listIsEmpty(const list_t* list){
+    return (!list) || (!list->head);
 }
 
-int listIsCircular(const list_t* list){
-    if(!list || !list->head) return 0;
+bool listIsCircular(const list_t* list){
+    if(!list || !list->head) return false;
 
     node_t* slowPtr = list->head;
     node_t* fastPtr = list->head->next;
 
     while(fastPtr && fastPtr->next){
-        if(slowPtr == fastPtr) return 1;
+        if(slowPtr == fastPtr) return true;
+
         slowPtr = slowPtr->next;
         fastPtr = fastPtr->next->next;
     }
-    return 0;
+    return false;
 }
 
 list_status_t listForEach(const list_t* list, list_iterate_func func, void* user){
-    if(!list || !func) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list || !func) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
     
     node_t* walk = list->head;
     while(walk){
         func(walk->data, user);
         walk = walk->next;
     }
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listReverse(list_t* list){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY; 
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY; 
 
     node_t* prev = NULL;
     node_t* curr = list->head;
@@ -333,12 +322,12 @@ list_status_t listReverse(list_t* list){
 
     list->tail = list->head;
     list->head = prev;
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listDisplay(list_t* list, value_type type){
-    if(!list) return LIST_STATUS_INVALID;
-    if(!list->head) return LIST_STATUS_EMPTY;
+    if(!list) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
     node_t* walk = list->head;
     printf("\n");
@@ -361,7 +350,7 @@ list_status_t listDisplay(list_t* list, value_type type){
                 break;
             default:
                 printf("invalid type");
-                return LIST_STATUS_INVALID;
+                return LIST_ERR_NULL;
         }
         
         printf(" -> ");
@@ -386,7 +375,7 @@ int listCompare(list_t* list1, list_t* list2){
 }
 
 list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
-    if(!list || !node || !location) return LIST_STATUS_INVALID;
+    if(!list || !node || !location) return LIST_ERR_NULL;
 
     node_t* prev = NULL;
     node_t* curr = list->head;
@@ -398,7 +387,7 @@ list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
         curr = curr->next;
         index++;
     }
-    if(!curr) return LIST_STATUS_NOT_FOUND;
+    if(!curr) return LIST_ERR_NULL;
 
     if(prev == NULL)
         list->head = node->next;
@@ -410,7 +399,7 @@ list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
     if(location == 0){
         node->next = list->head;
         list->head = node;
-        return LIST_STATUS_OK;
+        return LIST_OK;
     }
     
     node_t* walk = list->head;
@@ -421,13 +410,13 @@ list_status_t listMoveTo(list_t* list, node_t* node, size_t location){
     node->next = walk->next;
     walk->next = node;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t merge(list_t* list_1, list_t* list_2){
-    if(!list_1 || !list_2) return LIST_STATUS_INVALID;
+    if(!list_1 || !list_2) return LIST_ERR_NULL;
 
-    if(list_2->head == NULL) return LIST_STATUS_OK;
+    if(list_2->head == NULL) return LIST_OK;
 
     if(list_1->head == NULL){
         list_1->head = list_2->head;
@@ -443,14 +432,14 @@ list_status_t merge(list_t* list_1, list_t* list_2){
     list_2->tail = NULL;
     list_2->size = 0;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t merge_alternate(list_t* list_1, list_t* list_2){
-    if(!list_1 || !list_2) return LIST_STATUS_INVALID;
+    if(!list_1 || !list_2) return LIST_ERR_NULL;
 
     if(list_1->head == NULL) return merge(list_1, list_2);
-    if(list_2->head == NULL) return LIST_STATUS_OK;
+    if(list_2->head == NULL) return LIST_OK;
 
     node_t* walk_1 = list_1->head;
     node_t* walk_2 = list_2->head;
@@ -469,13 +458,13 @@ list_status_t merge_alternate(list_t* list_1, list_t* list_2){
     list_2->tail = NULL;
     list_2->size = 0;
 
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }
 
 list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func){
-    if(!list_1 || !list_2) return LIST_STATUS_EMPTY;
-    if(!func) return LIST_STATUS_INVALID;
+    if(!list_1 || !list_2) return LIST_ERR_NULL;
+    if(!func) return LIST_ERR_NULL;
 
     func(list_1, list_2);
-    return LIST_STATUS_OK;
+    return LIST_OK;
 }

@@ -4,9 +4,9 @@
 
     typedef enum{
         STACK_OK = 0,
-        STACK_ERROR_NULL,
-        STACK_ERROR_EMPTY,
-        STACK_ERROR_ALLOC
+        STACK_ERR_ALLOC,
+        STACK_ERR_NULL,
+        STACK_EMPTY
     }stack_status_t;
 
     typedef struct node{
@@ -26,7 +26,7 @@
     stack_status_t stack_pop(stack_t* stack, int* output);
 
     stack_status_t stack_peek(const stack_t* stack, int* output);
-    bool stack_is_empty(const stack_t* stack);
+    int stack_is_empty(const stack_t* stack);
     size_t stack_size(const stack_t* stack);
     stack_status_t stack_print(const stack_t* stack);
 

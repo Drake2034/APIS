@@ -1,13 +1,13 @@
 #include "sorting.h"
 
-list_status_t listSort_insertion(list_t* list){
+sort_status_t insertion_sort(){
     
 }
 
-list_status_t listSort_selection(){
+sort_status_t selection_sort(){
 
 }
 
-list_status_t listSort_bubble(){
-
+sort_status_t bubble_sort(){
+    
 }

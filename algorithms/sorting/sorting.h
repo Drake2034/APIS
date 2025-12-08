@@ -2,9 +2,19 @@
     #define SORTING_H
 
     #include "linkedlist.h"
+    #include "stack.h"
+    #include "queue.h"
 
-    typedef void (*list_sort_func)(list_t* list);
-        list_status_t listSort_insertion();
-        list_status_t listSort_bubble();
-        list_status_t listSort_selection();
+    typedef enum{
+        SORT_OK,
+        SORT_ERR_NULL,
+        SORT_EMPTY
+    }sort_status_t;
+
+    //to work on
+    typedef void (*list_sort_func)(void** data_structure);
+        sort_status_t insertion_sort();
+        sort_status_t selection_sort();
+        sort_status_t bubble_sort();
+
 #endif
