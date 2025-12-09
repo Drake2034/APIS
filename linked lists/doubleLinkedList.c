@@ -265,3 +265,83 @@ bool listIsCircular(const list_t* list){
     }
     return false;
 }
+
+list_status_t listReverse(list_t* list){
+    if(!list) return LIST_ERR_NULL;
+    
+    node_t* prev = NULL;
+    node_t* curr = list->head;
+    node_t* next = NULL;
+    while(curr){
+        next = curr->next;
+        curr->next = prev;
+
+        prev = curr;
+        curr = next;
+    }
+
+    list->tail = list->head;
+    list->head = prev;
+
+    return LIST_OK;
+}
+
+list_status_t merge(list_t* list_1, list_t* list_2){
+    if(!list_1 || !list_2) return LIST_ERR_NULL;
+
+    if(!list_2->head) return LIST_OK;
+    if(!list_1->head){
+        list_1->head = list_2->head;
+        list_1->tail = list_2->head;
+    }else{
+        list_1->tail->next = list_2->head;
+        list_1->tail = list_2->tail;
+    }
+
+    list_1->size += list_2->size;
+
+    list_2->head = list_2->tail = NULL;
+    list_2->size = 0;
+
+    return LIST_OK;
+}
+
+list_status_t merge_alternate(list_t* list_1, list_t* list_2){
+    if(!list_1 || !list_2) return LIST_ERR_NULL;
+
+    if(!list_1->head) return merge(list_1, list_2);
+    if(!list_2->head) return LIST_OK;
+    
+    node_t* node1 = list_1->head;
+    node_t* node2 = list_2->head;
+
+    node_t* next1;
+    node_t* next2;
+    while(node1 && node2){
+        next1 = node1->next;
+        next2 = node2->next;
+
+        node1->next = node2;
+        node2->prev = node1;
+
+        if(!next1) break;
+        node2->next = next1;
+        next1->prev = node2;
+
+        node1 = next1;
+        node2 = next2;
+    }
+
+    list_1->size += list_2->size;
+    list_1->tail = list_2->tail;
+
+    list_2->head = list_2->tail = NULL;
+    list_2->size = 0;
+
+    return LIST_OK;
+}
+
+list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func){
+    if(!list_1 || !list_2 || !func) return LIST_ERR_NULL;
+    return func(list_1, list_2);
+}

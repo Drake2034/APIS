@@ -162,6 +162,12 @@ queue_status_t queue_reverse(queue_t* queue){
 queue_status_t queue_clone(queue_t* queue, queue_t** output){
     if(!queue || !output) return QUEUE_ERR_NULL;
 
+    if(!queue->head){
+        *output = queue_create();
+        if(!*output)
+            return QUEUE_ERR_ALLOC;
+    }
+
     queue_t* clonedQ = queue_create();
     if(!clonedQ) return QUEUE_ERR_ALLOC;
 
@@ -190,6 +196,6 @@ bool queue_compare(queue_t* queue_1, queue_t* queue_2){
         node1 = node1->next;
         node2 = node2->next;
     }
-    
+
     return (!node1) && (!node2);
 }

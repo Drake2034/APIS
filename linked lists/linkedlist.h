@@ -19,7 +19,7 @@
     }list_t;
 
     //callback types
-    typedef void (*list_iterate_func)(void* data, void* user);
+    typedef list_status_t (*list_iterate_func)(void* data, void* user);
         list_status_t listForEach(const list_t* list, list_iterate_func func, void* user);
 
     typedef bool (*list_predicate_func)(void* element, void* user_data);
@@ -71,7 +71,7 @@
 
     list_status_t listReverse(list_t* list);
     
-    typedef void (*list_merge_func)(list_t* list_1, list_t* list_2);
+    typedef list_status_t (*list_merge_func)(list_t* list_1, list_t* list_2);
         list_status_t merge(list_t* list_1, list_t* list_2);
         list_status_t merge_alternate(list_t* list_1, list_t* list_2);
     list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func);

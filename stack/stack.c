@@ -142,7 +142,12 @@ stack_status_t stack_reverse(stack_t* stack){
 
 stack_status_t stack_clone(stack_t* stack, stack_t** output){
     if(!stack || !output) return STACK_ERR_NULL;
-    if(!stack->stack_ptr) return STACK_EMPTY;
+
+    if(!stack->stack_ptr){
+        *output = stack_create();
+        if(!*output)
+            return STACK_ERR_ALLOC;
+    }
 
     stack_t* clonedStack = stack_create();
     if(!clonedStack) return STACK_ERR_ALLOC;
