@@ -322,6 +322,7 @@ list_status_t listReverse(list_t* list){
 
     list->tail = list->head;
     list->head = prev;
+    
     return LIST_OK;
 }
 

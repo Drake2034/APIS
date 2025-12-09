@@ -108,8 +108,10 @@ stack_status_t stack_clear(stack_t* stack){
     node_t* walk = stack->stack_ptr;
     while(walk){
         node_t* next = walk->next;
+
         if(walk->data) walk->data = NULL;
         free(walk);
+        
         walk = next;
     }
 
@@ -138,7 +140,7 @@ stack_status_t stack_reverse(stack_t* stack){
     return STACK_OK;
 }
 
-stack_status_t stack_clone(stack_t* stack, stack_t* output){
+stack_status_t stack_clone(stack_t* stack, stack_t** output){
     if(!stack || !output) return STACK_ERR_NULL;
     if(!stack->stack_ptr) return STACK_EMPTY;
 
@@ -147,26 +149,30 @@ stack_status_t stack_clone(stack_t* stack, stack_t* output){
 
     node_t* walk = stack->stack_ptr;
     while(walk){
-        stack_push(clonedStack, walk->data);
+        stack_status_t status = stack_push(clonedStack, walk->data);
+        if(status != STACK_OK){
+            stack_destroy(clonedStack);
+            return status;
+        }
         walk = walk->next;
     }
 
     stack_reverse(clonedStack);
-    output = clonedStack;
+    *output = clonedStack;
 
     return STACK_OK;
 }
 
-int stack_compare(stack_t* stack_1, stack_t* stack_2){
-    if(!stack_1 || !stack_2) return 0;
+bool stack_compare(stack_t* stack_1, stack_t* stack_2){
+    if(!stack_1 || !stack_2) return false;
 
     node_t* node1 = stack_1->stack_ptr;
     node_t* node2 = stack_2->stack_ptr;
     while(node1 && node2){
-        if(node1->data != node2->data) return 0;
+        if(node1->data != node2->data) return false;
         node1 = node1->next;
         node2 = node2->next;
     }
 
-    return (node1 == NULL && node2 == NULL) ? 1 : 0;
+    return (!node1) && (!node2); 
 }

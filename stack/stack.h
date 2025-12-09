@@ -26,11 +26,14 @@
     stack_status_t stack_pop(stack_t* stack, int* output);
 
     stack_status_t stack_peek(const stack_t* stack, int* output);
-    int stack_is_empty(const stack_t* stack);
+    bool stack_is_empty(const stack_t* stack);
     size_t stack_size(const stack_t* stack);
     stack_status_t stack_print(const stack_t* stack);
 
     stack_status_t stack_clear(stack_t* stack);
     stack_status_t stack_reverse(stack_t* stack);
+
+    stack_status_t stack_clone(stack_t* stack, stack_t** output);
+    bool stack_compare(stack_t* stack_1, stack_t* stack_2);
 
 #endif

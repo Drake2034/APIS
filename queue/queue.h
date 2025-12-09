@@ -36,4 +36,9 @@
     size_t queue_size(const queue_t* queue);
     queue_status_t queue_print(const queue_t* queue);
 
+    queue_status_t queue_clear(queue_t* queue);
+    queue_status_t queue_reverse(queue_t* queue);
+
+    queue_status_t queue_clone(queue_t* queue, queue_t** output);
+    bool queue_compare(queue_t* queue_1, queue_t* queue_2);
 #endif

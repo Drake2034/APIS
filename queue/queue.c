@@ -117,3 +117,79 @@ queue_status_t queue_print(const queue_t* queue){
 
     return QUEUE_OK;
 }
+
+queue_status_t queue_clear(queue_t* queue){
+    if(!queue) return QUEUE_ERR_NULL;
+    if(!queue->head) return QUEUE_OK;
+
+    node_t* walk = queue->head;
+    while(walk){
+        node_t* next = walk->next;
+
+        if(walk->data) walk->data = NULL;
+        free(walk);
+
+        walk = next;
+    }
+
+    queue->head = queue->tail = NULL;
+    queue->size = 0;
+
+    return QUEUE_OK;
+}
+
+queue_status_t queue_reverse(queue_t* queue){
+    if(!queue) return QUEUE_ERR_NULL;
+    if(!queue->head) return QUEUE_EMPTY;
+
+    node_t* prev = NULL;
+    node_t* curr = queue->head;
+    node_t* next = NULL;
+    while(curr){
+        next = curr->next;
+        curr->next = prev;
+
+        prev = curr;
+        curr = next;
+    }
+
+    queue->tail = queue->head;
+    queue->head = prev;
+
+    return QUEUE_OK;
+}
+
+queue_status_t queue_clone(queue_t* queue, queue_t** output){
+    if(!queue || !output) return QUEUE_ERR_NULL;
+
+    queue_t* clonedQ = queue_create();
+    if(!clonedQ) return QUEUE_ERR_ALLOC;
+
+    node_t* walk = queue->head;
+    node_t* walk = queue->head;
+    while(walk){
+        queue_status_t status = queue_enqueue(clonedQ, walk->data);
+        if(status != QUEUE_OK){
+            queue_destroy(clonedQ);
+            return status;
+        }
+        walk = walk->next;
+    }
+    *output = clonedQ;
+
+    return QUEUE_OK;
+}
+
+bool queue_compare(queue_t* queue_1, queue_t* queue_2){
+    if(!queue_1 || !queue_2) return false;
+
+    node_t* node1 = queue_1->head;
+    node_t* node2 = queue_2->head;
+    while(node1 && node2){
+        if(node1->data != node2->data) return false;
+        node1 = node1->next;
+        node2 = node2->next;
+    }
+    
+    return (!node1) && (!node2);
+}
