@@ -6,7 +6,7 @@
     #include <stdio.h>
 
     typedef enum{
-        QUEUE_OK,
+        QUEUE_OK = 0,
         QUEUE_ERR_ALLOC,
         QUEUE_ERR_NULL,
         QUEUE_EMPTY

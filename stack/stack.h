@@ -1,6 +1,9 @@
 #ifndef STACK_H
     #define STACK_H
+    
     #include <stddef.h>
+    #include <stdio.h>
+    #include <stdbool.h>
 
     typedef enum{
         STACK_OK = 0,
@@ -15,7 +18,7 @@
     }node_t;
 
     typedef struct stack{
-        node_t* stack_ptr;
+        node_t* top;
         size_t size;
     }stack_t;
 
@@ -33,7 +36,9 @@
     stack_status_t stack_clear(stack_t* stack);
     stack_status_t stack_reverse(stack_t* stack);
 
-    stack_status_t stack_clone(stack_t* stack, stack_t** output);
+    stack_status_t stack_clone(const stack_t* src, stack_t** output);
+    stack_status_t stack_copy(const stack_t* src, stack_t** output);
+
     bool stack_compare(stack_t* stack_1, stack_t* stack_2);
 
 #endif
