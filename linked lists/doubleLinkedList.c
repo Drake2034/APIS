@@ -1,12 +1,6 @@
-#include "linkedlist.h"
+#include "dll.h"
 
-typedef struct node{
-    void* data;
-    struct node* next;
-    struct node* prev;
-}node_t;
-
-static void freeNode(node_t* node){
+void freeNode(dll_node_t* node){
     if(!node) return;
 
     if(node->data){
@@ -19,8 +13,8 @@ static void freeNode(node_t* node){
     free(node);
 }
 
-list_t* initList(void){
-    list_t* list = malloc(sizeof(list_t));
+dll_t* initList(void){
+    dll_t* list = malloc(sizeof(*list));
     if(!list){
         fprintf(stderr, "couldn't allocate memory\n");
         return NULL;
@@ -33,12 +27,12 @@ list_t* initList(void){
     return list;
 }
 
-list_status_t freeList(list_t* list){
+list_status_t freeList(dll_t* list){
     if(!list) return LIST_ERR_NULL;
 
-    node_t* walk = list->head;
+    dll_node_t* walk = list->head;
     while(walk){
-        node_t* next = walk->next;
+        dll_node_t* next = walk->next;
 
         printf("element memory freed at %p\n", (void*)walk);
         freeNode(walk);
@@ -55,60 +49,61 @@ list_status_t freeList(list_t* list){
     return LIST_OK;
 }
 
-list_status_t listPushFront(list_t* list, void* value){
+list_status_t listPushFront(dll_t* list, void* value){
     if(!list) return LIST_ERR_NULL;
 
-    node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_ERR_ALLOC;
+    dll_node_t* node = malloc(sizeof(*node));
+    if(!node) return LIST_ERR_ALLOC;
 
-    nodeToPush->data = value;
-    nodeToPush->prev = NULL;
+    node->data = value;
+    node->prev = NULL;
 
     if(list->tail == NULL){
-        nodeToPush->next = NULL;
+        node->next = NULL;
 
-        list->head = list->tail = nodeToPush;
+        list->head = list->tail = node;
         list->size++;
 
         return LIST_OK;
     }
 
-    nodeToPush->next = list->head;
+    node->next = list->head;
 
-    list->head->prev = nodeToPush;
-    list->head = nodeToPush;
+    list->head->prev = node;
+    list->head = node;
     list->size++;
+
     return LIST_OK;
 }
 
-list_status_t listPushBack(list_t* list, void* value){
+list_status_t listPushBack(dll_t* list, void* value){
     if(!list) return LIST_ERR_NULL;
 
-    node_t* nodeToPush = malloc(sizeof(node_t));
-    if(!nodeToPush) return LIST_ERR_ALLOC;
+    dll_node_t* node = malloc(sizeof(*node));
+    if(!node) return LIST_ERR_ALLOC;
 
-    nodeToPush->data = value;
-    nodeToPush->next = NULL;
+    node->data = value;
+    node->next = NULL;
 
     if(list->tail == NULL){
-        nodeToPush->prev = NULL;
+        node->prev = NULL;
 
-        list->head = list->tail = nodeToPush;
+        list->head = list->tail = node;
         list->size++;
         
         return LIST_OK;
     }
 
-    nodeToPush->prev = list->tail;
+    node->prev = list->tail;
 
-    list->tail->next = nodeToPush;
-    list->tail = nodeToPush;
+    list->tail->next = node;
+    list->tail = node;
     list->size++;
 
     return LIST_OK;
 }
 
-list_status_t listInsertAt(list_t* list, size_t location, void* value){
+list_status_t listInsertAt(dll_t* list, size_t location, void* value){
     if(!list) return LIST_ERR_NULL;
 
     if(location > list->size)
@@ -118,31 +113,31 @@ list_status_t listInsertAt(list_t* list, size_t location, void* value){
     if(location == list->size)
         return listPushBack(list, value);
 
-    node_t* nodeToInsert = malloc(sizeof(node_t));
-    if(!nodeToInsert) return LIST_ERR_ALLOC;
+    dll_node_t* node = malloc(sizeof(*node));
+    if(!node) return LIST_ERR_ALLOC;
 
-    nodeToInsert->data = value;
+    node->data = value;
 
-    node_t* curr = list->head;
+    dll_node_t* curr = list->head;
     for(size_t i = 0; i < location; i++, curr = curr->next);
 
-    node_t* next = curr->next;
+    dll_node_t* next = curr->next;
 
-    nodeToInsert->next = next;
-    nodeToInsert->prev = curr;
+    node->next = next;
+    node->prev = curr;
 
-    next->prev = nodeToInsert;
-    curr->next = nodeToInsert;
+    next->prev = node;
+    curr->next = node;
 
     list->size++;
     return LIST_OK;
 }
 
-list_status_t listPopFront(list_t* list){
+list_status_t listPopFront(dll_t* list){
     if(!list) return LIST_ERR_NULL;
     if(!list->head) return LIST_EMPTY;
 
-    node_t* node = list->head;
+    dll_node_t* node = list->head;
 
     list->head = node->next;
     list->head->prev = NULL;
@@ -153,12 +148,12 @@ list_status_t listPopFront(list_t* list){
     return LIST_OK;
 }
 
-list_status_t listPopBack(list_t* list){
+list_status_t listPopBack(dll_t* list){
     if(!list) return LIST_ERR_NULL;
     if(!list->head) return LIST_EMPTY;
 
     if(list->head == list->tail){
-        node_t* node = list->head;
+        dll_node_t* node = list->head;
         list->head = list->tail = NULL;
 
         list->size = 0;
@@ -166,7 +161,7 @@ list_status_t listPopBack(list_t* list){
         return LIST_OK;
     }
 
-    node_t* curr = list->head;
+    dll_node_t* curr = list->head;
     while(curr->next){
         curr = curr->next;
     }
@@ -182,7 +177,7 @@ list_status_t listPopBack(list_t* list){
     return LIST_OK;
 }
 
-list_status_t listRemoveAt(list_t* list, size_t location){
+list_status_t listRemoveAt(dll_t* list, size_t location){
     if(!list) return LIST_ERR_NULL;
     if(!list->head) return LIST_EMPTY;
 
@@ -193,7 +188,7 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     if(location == list->size - 1)
         return listPopBack(list);
 
-    node_t* walk = list->head;
+    dll_node_t* walk = list->head;
     for(size_t i = 0; i < location; i++)
         walk = walk->next;
 
@@ -206,11 +201,11 @@ list_status_t listRemoveAt(list_t* list, size_t location){
     return LIST_OK;
 }
 
-list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
+list_status_t listSelect(dll_t* list, list_select_func func, dll_t* output){
     if(!list || !output) return LIST_ERR_NULL;
     if(!list->head) return LIST_EMPTY;
 
-    node_t* walk = list->head;
+    dll_node_t* walk = list->head;
     size_t i = 0;
     while(walk){
         if(func(walk->data, i, list->size)){
@@ -223,7 +218,7 @@ list_status_t listSelect(list_t* list, list_select_func func, list_t* output){
     return LIST_OK;
 }
 
-list_status_t listClone(const list_t* list, list_t** output){
+list_status_t listClone(const dll_t* list, dll_t** output){
     if(!list || !output) return LIST_ERR_NULL;
 
     if(!list->head){
@@ -231,31 +226,32 @@ list_status_t listClone(const list_t* list, list_t** output){
         if(!*output) return LIST_ERR_ALLOC;
     }
 
-    list_t* clonedList = initList();
+    dll_t* clonedList = initList();
     if(!clonedList) return LIST_ERR_ALLOC;
 
-    node_t* walk = list->head;
+    dll_node_t* walk = list->head;
     while(walk){
         listPushBack(clonedList, walk);
         walk = walk->next;
     }
     *output = clonedList;
+
     return LIST_OK;
 }
 
-size_t listSize(const list_t* list){
+size_t listSize(const dll_t* list){
     return list ? list->size : 0;
 }
 
-bool listIsEmpty(const list_t* list){
+bool listIsEmpty(const dll_t* list){
     return (!list) || (!list->head);
 }
 
-bool listIsCircular(const list_t* list){
+bool listIsCircular(const dll_t* list){
     if(!list || !list->head) return false;
 
-    node_t* slowPtr = list->head;
-    node_t* fastPtr = list->head;
+    dll_node_t* slowPtr = list->head;
+    dll_node_t* fastPtr = list->head;
 
     while(slowPtr && fastPtr->next){
         if(slowPtr == fastPtr) return true;
@@ -266,12 +262,12 @@ bool listIsCircular(const list_t* list){
     return false;
 }
 
-list_status_t listReverse(list_t* list){
+list_status_t listReverse(dll_t* list){
     if(!list) return LIST_ERR_NULL;
     
-    node_t* prev = NULL;
-    node_t* curr = list->head;
-    node_t* next = NULL;
+    dll_node_t* prev = NULL;
+    dll_node_t* curr = list->head;
+    dll_node_t* next = NULL;
     while(curr){
         next = curr->next;
         curr->next = prev;
@@ -286,7 +282,7 @@ list_status_t listReverse(list_t* list){
     return LIST_OK;
 }
 
-list_status_t merge(list_t* list_1, list_t* list_2){
+list_status_t merge(dll_t* list_1, dll_t* list_2){
     if(!list_1 || !list_2) return LIST_ERR_NULL;
 
     if(!list_2->head) return LIST_OK;
@@ -306,17 +302,17 @@ list_status_t merge(list_t* list_1, list_t* list_2){
     return LIST_OK;
 }
 
-list_status_t merge_alternate(list_t* list_1, list_t* list_2){
+list_status_t merge_alternate(dll_t* list_1, dll_t* list_2){
     if(!list_1 || !list_2) return LIST_ERR_NULL;
 
     if(!list_1->head) return merge(list_1, list_2);
     if(!list_2->head) return LIST_OK;
     
-    node_t* node1 = list_1->head;
-    node_t* node2 = list_2->head;
+    dll_node_t* node1 = list_1->head;
+    dll_node_t* node2 = list_2->head;
 
-    node_t* next1;
-    node_t* next2;
+    dll_node_t* next1;
+    dll_node_t* next2;
     while(node1 && node2){
         next1 = node1->next;
         next2 = node2->next;
@@ -341,7 +337,7 @@ list_status_t merge_alternate(list_t* list_1, list_t* list_2){
     return LIST_OK;
 }
 
-list_status_t listMerge(list_t* list_1, list_t* list_2, list_merge_func func){
+list_status_t listMerge(dll_t* list_1, dll_t* list_2, list_merge_func func){
     if(!list_1 || !list_2 || !func) return LIST_ERR_NULL;
     return func(list_1, list_2);
 }
