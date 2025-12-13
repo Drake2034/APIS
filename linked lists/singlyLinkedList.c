@@ -205,31 +205,24 @@ list_status_t listSelect(sll_t* list, list_select_func func, sll_t* output){
     return LIST_OK;
 }
 
-//rework
+// temporary fix
+list_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, void* ctx){
+    if(!list || !pred_func) return LIST_ERR_NULL;
+    if(!list->head) return LIST_EMPTY;
 
-// list_status_t listRemoveIf(
-//     sll_t* list,
-//     list_predicate_func pred_func,
-//     list_select_func select_func,
-//     void* user_data,
-//     sll_t** output){
-
-//     if(!list || !pred_func || !select_func || !user_data) return LIST_ERR_NULL;
-//     if(!list->head) return LIST_EMPTY; 
-
-//     sll_node_t* prev = NULL;
-//     sll_node_t* curr = list->head;
-//     while(curr){
-//         if(pred_func(curr->data, user_data)){
-//             listSelect(list, select_func, output);
-//         }
-
-//         prev = curr;
-//         curr = curr->next;
-//     }
-    
-//     return LIST_STATUS_NOT_FOUND;
-// }
+    sll_node_t* walk = list->head;
+    while(walk){
+        if(pred_func(walk, ctx)){
+            sll_node_t* node = walk;
+            walk = node->next;
+            free(node);
+            list->size--;
+        }else{
+            walk = walk->next;
+        }
+    }
+    return LIST_OK;
+}
 
 list_status_t listFindIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output){
     if(!list || !pred_func || !select_func || !user_data || !output) return LIST_ERR_NULL;

@@ -27,9 +27,16 @@
     typedef list_status_t (*list_iterate_func)(void* data, void* user);
         list_status_t listForEach(const sll_t* list, list_iterate_func func, void* user);
 
-    typedef bool (*list_predicate_func)(void* element, void* user_data);
-        bool match(void* element, void* data){return *(int*)element == *(int*)data;}
-        bool not_match(void* element, void* data){return !match(element, data);}
+    typedef bool (*list_predicate_func)(const sll_node_t* node, void* ctx);
+        bool match_value(const sll_node_t* node, void* ctx){
+            int target = *(int*)ctx;
+            return node->data == target;
+        }
+
+        bool is_even(const sll_node_t* node, void* ctx){
+            (void)ctx;
+            return (int)node->data % 2 == 0;
+        }
 
     typedef bool (*list_select_func)(void*data, size_t index, size_t size);
         bool select_first(void* data, size_t index, size_t size){return index == 0;}
@@ -58,7 +65,7 @@
     void freeNode(sll_node_t* node);
 
     sll_t* initList(void);
-    list_status_t freeList(sll_t* list);
+    list_status_t listDelete(sll_t* list);
 
     list_status_t listPushFront(sll_t* list, void* value);
     list_status_t listPushBack(sll_t* list, void* value);

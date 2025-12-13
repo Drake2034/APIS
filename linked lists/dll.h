@@ -29,11 +29,18 @@
     typedef list_status_t (*list_iterate_func)(void* data, void* user);
         list_status_t listForEach(const dll_t* list, list_iterate_func func, void* user);
 
-    typedef bool (*list_predicate_func)(void* element, void* user_data);
-        bool match(void* element, void* data){return *(int*)element == *(int*)data;}
-        bool not_match(void* element, void* data){return !match(element, data);}
+    typedef bool (*list_predicate_func)(const dll_node_t* node, void* ctx);
+        bool match_value(const dll_node_t* node, void* ctx){
+            int target = *(int*)ctx;
+            return node->data == target;
+        }
 
-    typedef bool (*list_select_func)(void*data, size_t index, size_t size);
+        bool is_even(const dll_node_t* node, void* ctx){
+            (void)ctx;
+            return (int)node->data % 2 == 0;
+        }
+
+    typedef bool (*list_select_func)(void* data, size_t index, size_t size);
         bool select_first(void* data, size_t index, size_t size){return index == 0;}
         bool select_last(void* data, size_t index, size_t size){return index == size - 1;}
         bool select_mid(void* data, size_t index, size_t size){return index == size / 2;}
