@@ -15,7 +15,7 @@
 
     typedef struct sll_node{
         void* data;
-        struct ssl_node* next;
+        struct sll_node* next;
     }sll_node_t;
 
     typedef struct sll{
@@ -71,8 +71,10 @@
     list_status_t listClone(const sll_t* list, sll_t** output);
 
     size_t listSize(const sll_t* list);
+    
     bool listIsEmpty(const sll_t* list);
     bool listIsCircular(const sll_t* list);
+    bool listIsSorted(const sll_t* list);
 
     list_status_t listReverse(sll_t* list);
     
@@ -80,8 +82,5 @@
         list_status_t merge(sll_t* list_1, sll_t* list_2);
         list_status_t merge_alternate(sll_t* list_1, sll_t* list_2);
     list_status_t listMerge(sll_t* list_1, sll_t* list_2, list_merge_func func);
-
-    //to work on
-    list_status_t listIsSorted();
 
 #endif

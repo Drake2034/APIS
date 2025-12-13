@@ -25,7 +25,6 @@
         size_t size;
     }dll_t;
 
-
     //callback types
     typedef list_status_t (*list_iterate_func)(void* data, void* user);
         list_status_t listForEach(const dll_t* list, list_iterate_func func, void* user);
@@ -76,6 +75,7 @@
     size_t listSize(const dll_t* list);
     bool listIsEmpty(const dll_t* list);
     bool listIsCircular(const dll_t* list);
+    bool listIsSorted(const dll_t* list);
 
     list_status_t listReverse(dll_t* list);
     
@@ -84,6 +84,4 @@
         list_status_t merge_alternate(dll_t* list_1, dll_t* list_2);
     list_status_t listMerge(dll_t* list_1, dll_t* list_2, list_merge_func func);
 
-    //to work on
-    list_status_t listIsSorted();
 #endif

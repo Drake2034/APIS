@@ -341,3 +341,14 @@ list_status_t listMerge(dll_t* list_1, dll_t* list_2, list_merge_func func){
     if(!list_1 || !list_2 || !func) return LIST_ERR_NULL;
     return func(list_1, list_2);
 }
+
+bool listIsSorted(const dll_t* list){
+    if(!list || !list->head) return false;
+
+    dll_node_t* walk = list->head;
+    while(walk){
+        if(walk->data >= walk->next->data) return false;
+        walk = walk->next;
+    }
+    return true;
+}

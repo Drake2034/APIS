@@ -466,3 +466,14 @@ list_status_t listMerge(sll_t* list_1, sll_t* list_2, list_merge_func func){
     if(!list_1 || !list_2 || !func) return LIST_ERR_NULL;
     return func(list_1, list_2);
 }
+
+bool listIsSorted(const sll_t* list){
+    if(!list || !list->head) return false;
+
+    sll_node_t* walk = list->head;
+    while(walk){
+        if(walk->data >= walk->next->data) return false;
+        walk = walk->next;
+    }
+    return true;
+}
