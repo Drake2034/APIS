@@ -30,14 +30,11 @@ sll_t* initList(void){
 list_status_t listDelete(sll_t* list){
     if(!list) return LIST_ERR_NULL;
     
-    sll_node_t* walk = list->head;
-    while(walk){
-        sll_node_t* next = walk->next;
-        
-        printf("element memory freed at %p\n", (void*)walk);
-        freeNode(walk);
-        
-        walk = next;
+    sll_node_t** walk = &list->head;
+    while(*walk){
+        sll_node_t* node = *walk;
+        *walk = node->next;
+        freeNode(node);
     }
 
     list->head = list->tail = NULL;
@@ -85,8 +82,10 @@ list_status_t listPushBack(sll_t* list, void* value){
 
     if(list->tail == NULL){
         node->next = NULL;
+
         list->head = list->tail = node;
         list->size++;
+
         return LIST_OK;
     }
     
@@ -97,28 +96,20 @@ list_status_t listPushBack(sll_t* list, void* value){
     return LIST_OK;
 }
 
-list_status_t listInsertAt(sll_t* list, size_t location, void* value){
-    if(!list) return LIST_ERR_NULL;
+list_status_t listInsertAt(sll_t* list, size_t location, void* data){
+    if(!list || location > list->size) return LIST_ERR_NULL;
 
-    if(location > list->size)
-        return LIST_ERR_NULL;
-    if(location == 0)
-        return listPushFront(list, value);
-    if(location == list->size)
-        return listPushBack(list, value);
+    sll_node_t** walk = &list->head;
+    for(size_t i = 0; i < location; ++i)
+        walk = &(*walk)->next; 
 
     sll_node_t* node = malloc(sizeof(*node));
     if(!node) return LIST_ERR_ALLOC;
 
-    node->data = value;
+    node->data = data;
+    node->next = *walk;
+    *walk = node;
 
-    sll_node_t* curr = list->head;
-    for(size_t i = 0; i < location - 1; i++, curr = curr->next);
-    
-    sll_node_t* next = curr->next;
-
-    curr->next = node;
-    node->next = next;
     list->size++;
 
     return LIST_OK;
@@ -139,50 +130,36 @@ list_status_t listPopFront(sll_t* list){
 
 list_status_t listPopBack(sll_t* list){
     if(!list) LIST_ERR_NULL;
-    if(!list->head) return LIST_EMPTY;
 
-    if(list->head == list->tail){
-        sll_node_t* node = list->head;
-        list->head = list->head = NULL;
-        list->size = 0;
-
-        free(node);
-        return LIST_OK;
+    sll_node_t** walk = &list->head;
+    while((*walk)->next){
+        walk = &(*walk)->next;
     }
 
-    sll_node_t* prev = NULL;
-    sll_node_t* curr = list->head;
-    while(curr->next){
-        prev = curr;
-        curr = curr->next;
-    }
+    sll_node_t* node = *walk;
+    (*walk) = NULL;
 
-    list->tail = prev;
-    list->tail->next = NULL;
+    freeNode(node);
+
+    list->tail = *walk;
     list->size--;
-
-    free(curr);
-
+    
     return LIST_OK;
 }
 
 list_status_t listRemoveAt(sll_t* list, size_t location){
-    if(!list) return LIST_ERR_NULL;
-    if(!list->head) return LIST_EMPTY;
+    if(!list || location > list->size) return LIST_ERR_NULL;
 
-    if(location >= list->size)
-        return LIST_ERR_NULL;
-    if(location == 0)
-        return listPopFront(list);
-    if(location == list->size - 1)
-        return listPopBack(list);
+    sll_node_t** walk = &list->head;
+    for(size_t i = 0; i < location; ++i){
+        walk = &(*walk)->next;
+    }
+
+    sll_node_t* node = *walk;
+    *walk = node->next;
     
-    sll_node_t* prev = list->head;
-    for(size_t i = 0; i < location - 1; i++)
-        prev = prev->next;
-    sll_node_t* curr = prev->next;
+    freeNode(node);
 
-    free(curr);
     list->size--;
 
     return LIST_OK;
