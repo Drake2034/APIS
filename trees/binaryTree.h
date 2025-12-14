@@ -21,7 +21,12 @@
 
     typedef struct bt{
         bt_node_t* root;
-        bt_node_t** leaves;
         size_t size;
     }bt_t;
+
+    bt_node_t* createNode(void* data);
+    void freeNode(bt_node_t node);
+
+    bt_t* bt_create(void);
+    tree_status_t bt_destroy(bt_t* tree);
 #endif
