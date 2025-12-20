@@ -7,11 +7,11 @@
     #include <stddef.h>
 
     typedef enum{
-        LIST_OK = 0,
-        LIST_ERR_ALLOC,
-        LIST_ERR_NULL,
-        LIST_EMPTY
-    }list_status_t;
+        SLL_OK = 0,
+        SLL_ERR_ALLOC,
+        SLL_ERR_NULL,
+        SLL_EMPTY
+    }sll_status_t;
 
     typedef struct sll_node{
         void* data;
@@ -24,8 +24,8 @@
         size_t size;
     }sll_t;
 
-    typedef list_status_t (*list_iterate_func)(void* data, void* user);
-        list_status_t listForEach(const sll_t* list, list_iterate_func func, void* user);
+    typedef sll_status_t (*list_iterate_func)(void* data, void* user);
+        sll_status_t listForEach(const sll_t* list, list_iterate_func func, void* user);
 
     typedef bool (*list_predicate_func)(const sll_node_t* node, void* ctx);
         bool match_value(const sll_node_t* node, void* ctx){
@@ -49,8 +49,8 @@
         bool select_all(void* data, size_t index, size_t size){return true;}
 
         //rewrok
-        list_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
-        list_status_t listFindIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
+        sll_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
+        sll_status_t listFindIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
 
     typedef enum{
         INT,
@@ -60,22 +60,22 @@
         BOOL
     }value_type;
 
-    list_status_t listDisplay(sll_t* list, value_type type);
+    sll_status_t listDisplay(sll_t* list, value_type type);
 
     void freeNode(sll_node_t* node);
 
     sll_t* initList(void);
-    list_status_t listDelete(sll_t* list);
+    sll_status_t listDelete(sll_t* list);
 
-    list_status_t listPushFront(sll_t* list, void* value);
-    list_status_t listPushBack(sll_t* list, void* value);
-    list_status_t listInsertAt(sll_t* list, size_t location, void* value);
+    sll_status_t listPushFront(sll_t* list, void* value);
+    sll_status_t listPushBack(sll_t* list, void* value);
+    sll_status_t listInsertAt(sll_t* list, size_t location, void* value);
 
-    list_status_t listPopFront(sll_t* list);
-    list_status_t listPopBack(sll_t* list);
-    list_status_t listRemoveAt(sll_t* list, size_t location);
+    sll_status_t listPopFront(sll_t* list);
+    sll_status_t listPopBack(sll_t* list);
+    sll_status_t listRemoveAt(sll_t* list, size_t location);
 
-    list_status_t listClone(const sll_t* list, sll_t** output);
+    sll_status_t listClone(const sll_t* list, sll_t** output);
 
     size_t listSize(const sll_t* list);
     
@@ -83,11 +83,11 @@
     bool listIsCircular(const sll_t* list);
     bool listIsSorted(const sll_t* list);
 
-    list_status_t listReverse(sll_t* list);
+    sll_status_t listReverse(sll_t* list);
     
-    typedef list_status_t (*list_merge_func)(sll_t* list_1, sll_t* list_2);
-        list_status_t merge(sll_t* list_1, sll_t* list_2);
-        list_status_t merge_alternate(sll_t* list_1, sll_t* list_2);
-    list_status_t listMerge(sll_t* list_1, sll_t* list_2, list_merge_func func);
+    typedef sll_status_t (*list_merge_func)(sll_t* list_1, sll_t* list_2);
+        sll_status_t merge(sll_t* list_1, sll_t* list_2);
+        sll_status_t merge_alternate(sll_t* list_1, sll_t* list_2);
+    sll_status_t listMerge(sll_t* list_1, sll_t* list_2, list_merge_func func);
 
 #endif
