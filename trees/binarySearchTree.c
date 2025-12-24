@@ -21,7 +21,7 @@ void free_node(bst_node_t* node){
     free(node);
 }
 
-bst_t* bt_create(void){
+bst_t* bst_create(void){
     bst_t* tree = malloc(sizeof *tree);
     if(!tree) return NULL;
 
@@ -31,7 +31,7 @@ bst_t* bt_create(void){
     return tree;
 }
 
-bst_status_t bt_destroy(bst_t* tree){
+bst_status_t bst_destroy(bst_t* tree){
     if(!tree) return BST_ERR_NULL;
 
     if(!tree->root) return BST_OK;
@@ -43,7 +43,7 @@ bst_status_t bt_destroy(bst_t* tree){
     free(tree->root);
 }
 
-bst_status_t bt_insert(bst_t* tree, void* data){
+bst_status_t bst_insert(bst_t* tree, void* data){
     if(!tree) return BST_ERR_NULL;
 
 
