@@ -352,3 +352,54 @@ bool listIsSorted(const dll_t* list){
     }
     return true;
 }
+
+dll_status_t listDisplay(dll_t* list, value_type type){
+    if(!list) return DLL_ERR_NULL;
+    if(!list->head) return DLL_EMPTY;
+
+    dll_node_t** walk = &list->head;
+    printf("\nNULL");
+    while(walk){
+        switch(type){
+            case INT:
+                printf("%d", *(int*)*walk);
+                break;
+            case FLOAT:
+                printf("%f", *(float*)*walk);
+                break;
+            case CHAR:
+                printf("%c", *(char*)*walk);
+                break;
+            case STRING:
+                printf("%s", (char*)*walk);
+                break;
+            case BOOL:
+                printf("%s", *(bool*)*walk ? "true" : "false");
+                break;
+            default:
+                printf("invalid type");
+                return DLL_ERR_NULL;
+        }
+        
+        printf(" <-> ");
+        walk = &(*walk)->next;
+    }
+    printf("NULL\n");
+}
+
+bool listSearch(const dll_t* list, void* data, size_t location){
+    if(!list) return false;
+
+    dll_node_t** walk = &list->head;
+    size_t i = 0;
+
+    while(walk){
+        if((*walk)->data == data){
+            location = i;
+            return true;
+        }
+        walk = &(*walk)->next;
+        i++;
+    }
+    return false;
+}

@@ -49,7 +49,7 @@
         bool select_all(void* data, size_t index, size_t size){return true;}
 
         //rewrok
-        sll_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
+        sll_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, void* ctx);
         sll_status_t listFindIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output);
 
     typedef enum{
@@ -82,6 +82,7 @@
     bool listIsEmpty(const sll_t* list);
     bool listIsCircular(const sll_t* list);
     bool listIsSorted(const sll_t* list);
+    bool listSearch(const sll_t* list, void* data, size_t location);
 
     sll_status_t listReverse(sll_t* list);
     

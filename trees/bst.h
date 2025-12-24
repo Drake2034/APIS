@@ -24,11 +24,12 @@
         size_t size;
     }bst_t;
 
-    bst_node_t* create_node(void* data);
     void free_node(bst_node_t* node);
 
-    bst_t* bt_create(void);
-    bst_status_t bt_destroy(bst_t* tree);
+    bst_t* bst_create(void);
+    bst_status_t bst_destroy(bst_t* tree);
 
-    bst_status_t bt_insert(bst_t* tree, void* data);
+    bst_status_t bst_insert(bst_t* tree, void* data);
+
+    bool bst_search(const bst_t* tree, void* data);
 #endif

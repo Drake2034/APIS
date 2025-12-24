@@ -201,7 +201,7 @@ sll_status_t listRemoveIf(sll_t* list, list_predicate_func pred_func, void* ctx)
     return SLL_OK;
 }
 
-sll_status_t listFindIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output){
+sll_status_t listSelectIf(sll_t* list, list_predicate_func pred_func, list_select_func select_func, void* user_data, sll_t* output){
     if(!list || !pred_func || !select_func || !user_data || !output) return SLL_ERR_NULL;
     if(!list->head) return SLL_EMPTY;
 
@@ -446,4 +446,21 @@ bool listIsSorted(const sll_t* list){
         *walk = &(*walk)->next;
     }
     return true;
+}
+
+bool listSearch(const sll_t* list, void* data, size_t location){
+    if(!list) return false;
+
+    sll_node_t** walk = &list->head;
+    size_t i = 0;
+    
+    while(walk){
+        if((*walk)->data == data){
+            location = i;
+            return true;
+        }
+        walk = &(*walk)->next;
+        i++;
+    }
+    return false;
 }

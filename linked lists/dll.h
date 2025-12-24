@@ -83,6 +83,7 @@
     bool listIsEmpty(const dll_t* list);
     bool listIsCircular(const dll_t* list);
     bool listIsSorted(const dll_t* list);
+    bool listSearch(const dll_t* list, void* data, size_t location);
 
     dll_status_t listReverse(dll_t* list);
     
