@@ -2,7 +2,10 @@
 #include "dll.h"
 #include "stack.h"
 #include "queue.h"
+#include "bst.h"
 
-int main(){
-    return 0;
+int main(void){
+    sll_t* list = initList();
+
+    return EXIT_SUCCESS;
 }

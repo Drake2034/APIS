@@ -30,14 +30,12 @@ dll_t* initList(void){
 dll_status_t freeList(dll_t* list){
     if(!list) return DLL_ERR_NULL;
 
-    dll_node_t* walk = list->head;
+    dll_node_t** walk = &list->head;
     while(walk){
-        dll_node_t* next = walk->next;
+        printf("element memory freed at %p\n", (void*)*walk);
+        freeNode(*walk);
 
-        printf("element memory freed at %p\n", (void*)walk);
-        freeNode(walk);
-
-        walk = next;
+        walk = &(*walk)->next;
     }
 
     list->head = list->tail = NULL;

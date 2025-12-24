@@ -13,9 +13,9 @@
     }stack_status_t;
 
     typedef struct node{
-        int* data;
+        void** data;
         struct node* next;
-    }node_t;
+    }stk_node_t;
 
     typedef struct stack{
         node_t* top;
@@ -25,11 +25,14 @@
     stack_t* stack_create(void);
     stack_status_t stack_destroy(stack_t* stack);
 
-    stack_status_t stack_push(stack_t* stack, int data);
-    stack_status_t stack_pop(stack_t* stack, int* output);
+    stack_status_t stack_push(stack_t* stack, void* data);
+    stack_status_t stack_pop(stack_t* stack, void** output);
 
-    stack_status_t stack_peek(const stack_t* stack, int* output);
+    stack_status_t stack_peek(const stack_t* stack, void** output);
+
     bool stack_is_empty(const stack_t* stack);
+    bool stack_search(const stack_t* stack, void* data);
+
     size_t stack_size(const stack_t* stack);
     stack_status_t stack_print(const stack_t* stack);
 
