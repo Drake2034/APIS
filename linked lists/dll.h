@@ -1,5 +1,5 @@
-#ifndef LINKEDLIST_H
-    #define LINKEDLIST_H
+#ifndef DLL_H
+    #define DLL_H
 
     #include <stdio.h>
     #include <stdlib.h>

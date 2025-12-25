@@ -1,5 +1,5 @@
-#ifndef BINARYSEARCHTREE_H
-    #define BINARYSREARCHTREE_H
+#ifndef BST_H
+    #define BST_H
 
     #include <stdio.h>
     #include <stdlib.h>
@@ -32,4 +32,13 @@
     bst_status_t bst_insert(bst_t* tree, void* data);
 
     bool bst_search(const bst_t* tree, void* data);
+
+    //traversal
+    bst_status_t depth_first    (const bst_t* tree, queue_t* output);
+    bst_status_t breadth_first  (const bst_t* tree, queue_t* output);
+
+    bst_status_t pre_order  (const bst_t* tree, queue_t* output);
+    bst_status_t in_order   (const bst_t* tree, queue_t* output);
+    bst_status_t post_order (const bst_t* tree, queue_t* output);
+    bst_status_t level_order(const bst_t* tree, queue_t* output);
 #endif

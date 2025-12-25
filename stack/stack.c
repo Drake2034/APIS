@@ -31,7 +31,7 @@ stack_status_t stack_destroy(stack_t* stack){
     return STACK_OK;
 }
 
-stack_status_t stack_push(stack_t* stack, int data){
+stack_status_t stack_push(stack_t* stack, void* data){
     if(!stack) return STACK_ERR_NULL;
 
     stk_node_t* new = malloc(sizeof *new);
@@ -46,7 +46,7 @@ stack_status_t stack_push(stack_t* stack, int data){
     return STACK_OK;
 }
 
-stack_status_t stack_pop(stack_t* stack, int* output){
+stack_status_t stack_pop(stack_t* stack, void** output){
     if(!stack) return STACK_ERR_NULL;
     if(!stack->top) return STACK_EMPTY;
 
@@ -62,7 +62,7 @@ stack_status_t stack_pop(stack_t* stack, int* output){
     return STACK_OK;
 }
 
-stack_status_t stack_peek(const stack_t* stack, int* output){
+stack_status_t stack_peek(const stack_t* stack, void** output){
     if(!stack) return STACK_ERR_NULL;
     if(!stack->top) return STACK_EMPTY;
 
@@ -73,6 +73,17 @@ stack_status_t stack_peek(const stack_t* stack, int* output){
 
 bool stack_is_empty(const stack_t* stack){
     return (!stack) || (stack->size == 0);
+}
+
+bool stack_search(const stack_t* stack, void* data){
+    if(!stack) return false;
+
+    stk_node_t** walk = &stack->top;
+    while(walk){
+        if((*walk)->data == data) return true;
+        walk = &(*walk)->next;
+    }
+    return false;
 }
 
 size_t stack_size(const stack_t* stack){

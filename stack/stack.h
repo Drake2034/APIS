@@ -18,7 +18,7 @@
     }stk_node_t;
 
     typedef struct stack{
-        node_t* top;
+        stk_node_t* top;
         size_t size;
     }stack_t;
 
